@@ -4,7 +4,6 @@
 
 /*
  * Plugin Name: GBPrimePay Payments
- * Plugin URI: https://wordpress.org/plugins/gbprimepay-payments-gateways/
  * Description: 3-D Secure Payment Gateway By GBPrimePay
  * Author: GBPrimePay
  * Author URI: https://www.gbprimepay.com
