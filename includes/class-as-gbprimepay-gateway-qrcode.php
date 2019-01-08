@@ -103,18 +103,14 @@ class AS_Gateway_Gbprimepay_Qrcode extends WC_Payment_Gateway_eCheck
       );
     }
 
-
-
     public function request_payment($order_id) {
-
 
       $order = wc_get_order($order_id);
 
       $callgetMerchantId = AS_Gbprimepay_API::getMerchantId();
       $callgenerateID = AS_Gbprimepay_API::generateID();
 
-
-      $amount = 1.10;
+      $amount = $order->get_total();
       $itemamount = number_format((($amount * 100)/100), 2, '.', '');
       $itemdetail = 'Charge for order ' . $order->get_order_number();
       // $itemReferenceId = ''.substr(time(), 4, 5).'00'.$order->get_order_number();

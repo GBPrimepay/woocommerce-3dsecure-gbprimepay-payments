@@ -114,7 +114,7 @@ class AS_Gateway_Gbprimepay_Barcode extends WC_Payment_Gateway_eCheck
       $callgenerateID = AS_Gbprimepay_API::generateID();
 
 
-      $amount = 1.10;
+      $amount = $order->get_total();
       $itemamount = number_format((($amount * 100)/100), 2, '.', '');
       $itemdetail = 'Charge for order ' . $order->get_order_number();
       // $itemReferenceId = ''.substr(time(), 4, 5).'00'.$order->get_order_number();
