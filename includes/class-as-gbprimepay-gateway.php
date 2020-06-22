@@ -69,7 +69,7 @@ class AS_Gateway_Gbprimepay extends WC_Payment_Gateway_CC
         if (!is_cart() && !is_checkout() && !isset($_GET['pay_for_order']) && !is_add_payment_method_page()) {
             return;
         }
-        wp_enqueue_script('se_gbprimepay', plugins_url('/assets/js/gbprimepay.js', dirname(__FILE__)));
+        wp_enqueue_script('se_gbprimepay', plugin_dir_url( __DIR__ ) .'assets/js/gbprimepay.js');
     }
 
     /**
@@ -109,7 +109,7 @@ class AS_Gateway_Gbprimepay extends WC_Payment_Gateway_CC
         } else {
             $pay_button_text = '';
         }
-?><div style="padding:1.25em 0 0 0;margin-top:-1.25em;display:inline-block;"><img style="float: left;max-height: 2.8125em;" src="<?php echo plugins_url( '../assets/images/creditcard.png', __FILE__ ); ?>" alt=""></div><?
+?><div style="padding:1.25em 0 0 0;margin-top:-1.25em;display:inline-block;"><img style="float: left;max-height: 2.8125em;" src="<?php echo plugin_dir_url( __DIR__ ) .'assets/images/creditcard.png'; ?>" alt=""></div><?
         echo '<div
 			id="gbprimepay-payment-data"
 			data-panel-label="' . esc_attr($pay_button_text) . '"

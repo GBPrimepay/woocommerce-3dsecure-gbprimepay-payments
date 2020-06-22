@@ -169,7 +169,7 @@ echo $echocode;
     public function gbprimepay_top() {
 $echocode = ''."\r\n";
 $echocode .= ''."\r\n";
-$echocode .= '<img style="margin:15px 0px 0px -12px !important;" src="'.plugins_url( '../assets/images/gbprimepay-logo.png', __FILE__ ).'" alt="gbprimepay.com">'."\r\n";
+$echocode .= '<img style="margin:15px 0px 0px -12px !important;" src="'.plugin_dir_url( __DIR__ ).'assets/images/gbprimepay-logo.png'.'" alt="gbprimepay.com">'."\r\n";
 $echocode .= '<h2>GBPrimePay Payments<small class="wc-admin-breadcrumb"><a href="admin.php?page=wc-settings&amp;tab=checkout" aria-label="Return to payments"><img draggable="false" class="emoji" alt="?" src="https://s.w.org/images/core/emoji/11/svg/2934.svg"></a></small></h2>'."\r\n";
 echo $echocode;
 

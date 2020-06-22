@@ -158,7 +158,7 @@ class AS_Gateway_Gbprimepay_Barcode extends WC_Payment_Gateway_eCheck
 
           wp_enqueue_script(
             'gbprimepay-barcode-ajax-script',
-            plugin_dir_url( __FILE__ ) . '../assets/js/gbprimepay-barcode-ajax.js',
+            plugin_dir_url( __DIR__ ) . 'assets/js/gbprimepay-barcode-ajax.js',
             array('jquery')
           );
 
@@ -199,9 +199,9 @@ echo '</style>';
  		return "
  			<center>
         <br><br>
-        <img src='" . plugins_url('/gbprimepay-payments-gateways/assets/images/checked.png') . "'  style='padding:0px 0px 0px 0px;windth:100%;'>
+        <img src='" . plugin_dir_url( __DIR__ ) .'assets/images/checked.png' . "'  style='padding:0px 0px 0px 0px;windth:100%;'>
  				<h3>GBPrimePay Bill Payment Payment Successful!</h3>
- 				<img src='" . plugins_url('/gbprimepay-payments-gateways/assets/images/gbprimepay-logo-pay.png') . "' style='padding:0px 0px 0px 0px;windth:100%;'>
+ 				<img src='" . plugin_dir_url( __DIR__ ) .'assets/images/gbprimepay-logo-pay.png' . "' style='padding:0px 0px 0px 0px;windth:100%;'>
  				<br><br><br>
  				Pay with Bill Payment Payment has been received and \"Order is Now Complete\".
  				<br><br><br>
