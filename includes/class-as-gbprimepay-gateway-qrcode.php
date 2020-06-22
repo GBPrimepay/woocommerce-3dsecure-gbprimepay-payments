@@ -156,7 +156,7 @@ class AS_Gateway_Gbprimepay_Qrcode extends WC_Payment_Gateway_eCheck
 
           wp_enqueue_script(
             'gbprimepay-qrcode-ajax-script',
-            plugins_url() . "/gbprimepay-payments-gateways/assets/js/gbprimepay-qrcode-ajax.js",
+            plugin_dir_url( __FILE__ ) . '../assets/js/gbprimepay-qrcode-ajax.js',
             array('jquery')
           );
 
