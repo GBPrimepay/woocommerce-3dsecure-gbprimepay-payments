@@ -4,6 +4,7 @@
 
 /*
  * Plugin Name: GBPrimePay Payments
+ * Plugin URI: https://wordpress.org/plugins/gbprimepay-payments-gateways/
  * Description: 3-D Secure Payment Gateway By GBPrimePay
  * Author: GBPrimePay
  * Author URI: https://www.gbprimepay.com
@@ -59,6 +60,15 @@ if (!class_exists('AS_Gbprimepay')) {
             add_action( 'init', array( $this, 'create_gbprimepay_barcode_post_type' ) );
             add_action( 'init', array( $this, 'create_gbprimepay_barcode_payment_page' ) );
             add_filter( 'template_include', array($this, 'gbprimepay_barcode_page_template'));
+
+
+            // Make filter
+            function filter_woocommerce_payment_gateway_get_new_payment_method_option_html_label($this_new_method_label, $instance){
+              $this_new_method_label = __('Use a new Credit Card', 'woocommerce');
+            return $this_new_method_label;
+            }
+            add_filter('woocommerce_payment_gateway_get_new_payment_method_option_html_label','filter_woocommerce_payment_gateway_get_new_payment_method_option_html_label', 10, 2 );
+            //
 
 
 

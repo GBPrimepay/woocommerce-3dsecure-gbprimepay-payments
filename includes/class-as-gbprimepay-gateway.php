@@ -56,6 +56,8 @@ class AS_Gateway_Gbprimepay extends WC_Payment_Gateway_CC
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
         add_action( 'woocommerce_api_'. strtolower( get_class($this) ), array( $this, 'secure_callback_handler' ) );
         add_action( 'init', 'secure_callback_handler' );
+
+
     }
     public function init_form_fields()
     {
@@ -219,9 +221,18 @@ class AS_Gateway_Gbprimepay extends WC_Payment_Gateway_CC
 
                             }
                     }else{
+                            if(gbp_instances('3D_SECURE_PAYMENT')==TRUE){
+
+                                  // 3-D Secure Payment
+                                  $makePaymentResponse = $gbprimepayApiObj->createOtpCharge($cardAccount['id'], $order);
+
+
+                            }else{
 
                                   // GBPrimePay Payment
                                   $makePaymentResponse = $gbprimepayApiObj->createCharge($cardAccount['id'], $order);
+
+                            }
 
                     }
 
@@ -333,9 +344,18 @@ class AS_Gateway_Gbprimepay extends WC_Payment_Gateway_CC
 
                         }
                 }else{
+                        if(gbp_instances('3D_SECURE_PAYMENT')==TRUE){
+
+                              // 3-D Secure Payment
+                              $makePaymentResponse = $gbprimepayApiObj->createOtpCharge($cardAccountId, $order);
+
+
+                        }else{
 
                               // GBPrimePay Payment
                               $makePaymentResponse = $gbprimepayApiObj->createCharge($cardAccountId, $order);
+
+                        }
 
                 }
 

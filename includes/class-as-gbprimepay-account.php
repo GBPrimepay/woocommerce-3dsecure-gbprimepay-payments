@@ -21,8 +21,6 @@ function gbprimepay_settings() {
 			add_action( 'woocommerce_settings_save_' . $this->id, array( $this, 'save' ) );
 			add_action( 'woocommerce_sections_' . $this->id,      array( $this, 'output_sections' ) );
 
-      self::gbprimepay_load_start();
-
 		}
 
 
@@ -128,6 +126,8 @@ function gbprimepay_settings() {
 			global $current_section;
 
 			$settings = $this->get_settings( $current_section );
+
+      self::gbprimepay_load_start();
       self::gbprimepay_top();
 			WC_Admin_Settings::output_fields( $settings );
       self::availablemethods();
@@ -144,20 +144,22 @@ function gbprimepay_settings() {
     }
         switch ($message) {
           case 0:
-          ?>
-          <div class="gbp_notice_message onlyloaded success notice notice-success is-dismissible" style="display:none;padding: 12px 12px;">
-          <p><strong>Verified, GBPrimePay Payments Settings is already set in <?echo $echopaymode;?></strong></p>
-          </div>
-          <?
+$echocode = ''."\r\n";
+$echocode .= '<div class="gbp_notice_message onlyloaded success notice notice-success is-dismissible" style="display:none;padding: 12px 12px;">
+<p><strong>Verified, GBPrimePay Payments Settings is already set in '.$echopaymode.'</strong></p>
+</div>'."\r\n";
+$echocode .= ''."\r\n";
+echo $echocode;
           break;
           case 2:
           break;
           case 3:
-          ?>
-          <div class="gbp_notice_message onlyloaded error notice notice-error is-dismissible" style="display:none;padding: 12px 12px;">
-          <p><strong>Error!, Missing credentials in config in <?echo $echopaymode;?></strong></p>
-          </div>
-          <?
+$echocode = ''."\r\n";
+$echocode .= '<div class="gbp_notice_message onlyloaded error notice notice-error is-dismissible" style="display:none;padding: 12px 12px;">
+<p><strong>Error!, Missing credentials in config in '.$echopaymode.'</strong></p>
+</div>'."\r\n";
+$echocode .= ''."\r\n";
+echo $echocode;
           break;
           default:
           break;
@@ -165,16 +167,24 @@ function gbprimepay_settings() {
   }
 
     public function gbprimepay_top() {
-      ?>
-      <img style="margin:15px 0px 0px -12px !important;" src="<?php echo plugins_url( '../assets/images/gbprimepay-logo.png', __FILE__ ); ?>" alt="gbprimepay.com">
-      <h2>GBPrimePay Payments<small class="wc-admin-breadcrumb"><a href="admin.php?page=wc-settings&amp;tab=checkout" aria-label="Return to payments"><img draggable="false" class="emoji" alt="?" src="https://s.w.org/images/core/emoji/11/svg/2934.svg"></a></small></h2>
-      <?
+$echocode = ''."\r\n";
+$echocode .= ''."\r\n";
+$echocode .= '<img style="margin:15px 0px 0px -12px !important;" src="'.plugins_url( '../assets/images/gbprimepay-logo.png', __FILE__ ).'" alt="gbprimepay.com">'."\r\n";
+$echocode .= '<h2>GBPrimePay Payments<small class="wc-admin-breadcrumb"><a href="admin.php?page=wc-settings&amp;tab=checkout" aria-label="Return to payments"><img draggable="false" class="emoji" alt="?" src="https://s.w.org/images/core/emoji/11/svg/2934.svg"></a></small></h2>'."\r\n";
+echo $echocode;
+
     }
     public function gbprimepay_load_start() {
-        ?><script type="text/javascript">jQuery('.gbp_notice_message').hide();</script><?
+$echocode = ''."\r\n";
+$echocode .= '<script type="text/javascript">jQuery(".gbp_notice_message").hide();</script>'."\r\n";
+$echocode .= ''."\r\n";
+echo $echocode;
     }
     public function gbprimepay_load_end() {
-      ?><script type="text/javascript">setTimeout(function(){jQuery('.gbp_notice_message').show();}, 700);</script><?
+$echocode = ''."\r\n";
+$echocode .= '<script type="text/javascript">setTimeout(function(){jQuery(".gbp_notice_message").show();}, 700);</script>'."\r\n";
+$echocode .= ''."\r\n";
+echo $echocode;
     }
     public function availablemethods() {
 
@@ -217,56 +227,57 @@ function gbprimepay_settings() {
           $echoenabledpayment_barcode = '<span class="woocommerce-input-toggle woocommerce-input-toggle--disabled">No</span>';
 
         }
+        $echocode = ''."\r\n";
+        $echocode .= '<div class="wrap">'."\r\n";
+        $echocode .= '<hr><h3>Payment Methods ('.$echopaymode.')</h3>'."\r\n";
+             $echocode .= '<table class="widefat fixed striped" cellspacing="0" style="width:60%;min-width:640px;">'."\r\n";
+        							$echocode .= '<thead>'."\r\n";
+        								$echocode .= '<tr>'."\r\n";
+        									$echocode .= '<th style="padding: 10px;width:50%;" class="name">Payment Method</th>'."\r\n";
+                          $echocode .= '<th style="text-align: center; padding: 10px;" class="status">Status</th>'."\r\n";
+                          $echocode .= '<th style="text-align: center; padding: 10px;" class="setting"></th>'."\r\n";
+                        $echocode .= '</tr>'."\r\n";
+        							$echocode .= '</thead>'."\r\n";
+        							$echocode .= '<tbody>'."\r\n";
+        								$echocode .= '<tr>'."\r\n";
+                          $echocode .= '<td class="name" style="padding-left: 30px;">'."\r\n";
+        													$echocode .= '<span id="span-for-active-button">'.$ccintegration.'</span>'."\r\n";
+        												$echocode .= '</td>'."\r\n";
+                          $echocode .= '<td class="status" style="text-align: center;">'."\r\n";
+                            $echocode .= $echoenabledpayment;
+                          $echocode .= '</td><td class="setting" style="text-align: center;">'."\r\n";
+        													$echocode .= '<a href="admin.php?page=wc-settings&amp;tab=checkout&amp;section=gbprimepay">Configuration</a>'."\r\n";
+        									$echocode .= '</td>'."\r\n";
+                        $echocode .= '</tr>'."\r\n";
+                        $echocode .= '<tr>'."\r\n";
+                          $echocode .= '<td class="name" style="padding-left: 30px;">'."\r\n";
+        													$echocode .= '<span id="span-for-active-button">QR Code integration with GBPrimePay</span>'."\r\n";
+        												$echocode .= '</td>'."\r\n";
+                          $echocode .= '<td class="status" style="text-align: center;">'."\r\n";
+                            $echocode .= $echoenabledpayment_qrcode;
+                          $echocode .= '</td><td class="setting" style="text-align: center;">'."\r\n";
+        													$echocode .= '<a href="admin.php?page=wc-settings&amp;tab=checkout&amp;section=gbprimepay_qrcode">Configuration</a>'."\r\n";
+        									$echocode .= '</td>'."\r\n";
+                        $echocode .= '</tr>'."\r\n";
+                        $echocode .= '<tr>'."\r\n";
+                          $echocode .= '<td class="name" style="padding-left: 30px;">'."\r\n";
+        													$echocode .= '<span id="span-for-active-button">Bill Payment integration with GBPrimePay</span>'."\r\n";
+        												$echocode .= '</td>'."\r\n";
+                          $echocode .= '<td class="status" style="text-align: center;">'."\r\n";
+                            $echocode .= $echoenabledpayment_barcode;
+                          $echocode .= '</td><td class="setting" style="text-align: center;">'."\r\n";
+        													$echocode .= '<a href="admin.php?page=wc-settings&amp;tab=checkout&amp;section=gbprimepay_barcode">Configuration</a>'."\r\n";
+        									$echocode .= '</td>'."\r\n";
+                        $echocode .= '</tr>'."\r\n";
 
-?>
-<div class="wrap">
-<hr><h3>Payment Methods (<?echo $echopaymode;?>)</h3>
-     <table class="widefat fixed striped" cellspacing="0" style="width:60%;min-width:640px;">
-							<thead>
-								<tr>
-									<th style="padding: 10px;width:50%;" class="name">Payment Method</th>
-                  <th style="text-align: center; padding: 10px;" class="status">Status</th>
-                  <th style="text-align: center; padding: 10px;" class="setting"></th>
-                </tr>
-							</thead>
-							<tbody>
-								<tr>
-                  <td class="name" style="padding-left: 30px;">
-													<span id="span-for-active-button"><?echo $ccintegration;?></span>
-												</td>
-                  <td class="status" style="text-align: center;">
-                    <?echo $echoenabledpayment;?>
-                  </td><td class="setting" style="text-align: center;">
-													<a href="admin.php?page=wc-settings&amp;tab=checkout&amp;section=gbprimepay">Configuration</a>
-									</td>
-                </tr>
-                <tr>
-                  <td class="name" style="padding-left: 30px;">
-													<span id="span-for-active-button">QR Code integration with GBPrimePay</span>
-												</td>
-                  <td class="status" style="text-align: center;">
-                    <?echo $echoenabledpayment_qrcode;?>
-                  </td><td class="setting" style="text-align: center;">
-													<a href="admin.php?page=wc-settings&amp;tab=checkout&amp;section=gbprimepay_qrcode">Configuration</a>
-									</td>
-                </tr>
-                <tr>
-                  <td class="name" style="padding-left: 30px;">
-													<span id="span-for-active-button">Bill Payment integration with GBPrimePay</span>
-												</td>
-                  <td class="status" style="text-align: center;">
-                    <?echo $echoenabledpayment_barcode;?>
-                  </td><td class="setting" style="text-align: center;">
-													<a href="admin.php?page=wc-settings&amp;tab=checkout&amp;section=gbprimepay_barcode">Configuration</a>
-									</td>
-                </tr>
+                      $echocode .= '</tbody>'."\r\n";
+        						$echocode .= '</table>'."\r\n";
+            $echocode .= '<br>'."\r\n";
+            $echocode .= '<hr>'."\r\n";
+           $echocode .= '</div>'."\r\n";
 
-              </tbody>
-						</table>
-    <br>
-    <hr>
-   </div>
-<?php
+        echo $echocode;
+
 }
 
 		public function save() {

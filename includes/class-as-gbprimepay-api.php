@@ -1022,6 +1022,164 @@ class AS_Gbprimepay_API {
 
 
 
+
+
+
+
+
+            /**
+             * @param $accountId
+             * @param WC_Order $order
+             */
+            public static function createOtpCharge($accountId, $order)
+            {
+                try {
+
+
+
+                  $callgetMerchantId = self::getMerchantId();
+                  $callgenerateID = self::generateID();
+
+
+                  $amount = $order->get_total();
+                  $itemamount = number_format((($amount * 100)/100), 2, '.', '');
+                  $itemdetail = 'Charge for order ' . $order->get_order_number();
+                  // $itemReferenceId = ''.substr(time(), 4, 5).'00'.$order->get_order_number();
+                  $itemReferenceId = '00000'.$order->get_order_number();
+                  $itemcustomerEmail = $order->get_billing_email();
+                  $customer_full_name = $order->get_billing_first_name() . ' ' . $order->get_billing_last_name();
+                  $gbprimepayCardId = $accountId;
+                  $otpCode = 'N';
+
+                  $gbprimepayUser = new AS_Gbprimepay_User_Account(get_current_user_id(), $order); // get gbprimepay user obj
+                  $getgbprimepay_customer_id = $gbprimepayUser->get_gbprimepay_user_id();
+
+                  $account_settings = get_option('gbprimepay_account_settings');
+
+
+
+                  if($account_settings['environment']=='production'){
+
+                        // GBPrimePay Payment
+
+                  }else{
+                          if(gbp_instances('3D_SECURE_PAYMENT')==TRUE){
+
+                                // 3-D Secure Payment
+                                $url = gbp_instances('URL_CHARGE_TEST');
+                                $otpCode = 'Y';
+
+                                $gbprimepay_otpurl = WC()->session->get('gbprimepay_otpurl');
+
+                                $otpResponseUrl = $gbprimepay_otpurl['ResponseUrl'];
+                                $otpBackgroundUrl = $gbprimepay_otpurl['BackgroundUrl'];
+
+                                $field = "{\r\n\"amount\": $itemamount,\r\n\"referenceNo\": \"$itemReferenceId\",\r\n\"detail\": \"$itemdetail\",\r\n\"customerName\": \"$customer_full_name\",\r\n\"customerEmail\": \"$itemcustomerEmail\",\r\n\"merchantDefined1\": \"$callgenerateID\",\r\n\"merchantDefined2\": null,\r\n\"merchantDefined3\": null,\r\n\"merchantDefined4\": null,\r\n\"merchantDefined5\": null,\r\n\"card\": {\r\n\"token\": \"$gbprimepayCardId\"\r\n},\r\n\"otp\": \"$otpCode\",\r\n\"responseUrl\": \"$otpResponseUrl\",\r\n\"backgroundUrl\": \"$otpBackgroundUrl\"\r\n}\r\n";
+
+
+                          }else{
+
+                                // GBPrimePay Payment
+
+                          }
+
+                  }
+
+                  $callback = AS_Gbprimepay_API::sendCHARGECurl("$url", $field, 'POST');
+
+
+
+                  if ($callback['resultCode']=="00") {
+                    if (!empty($callback['gbpReferenceNo']) && ($otpCode == 'Y')) {
+
+                          $account_settings = get_option('gbprimepay_account_settings');
+
+                          $otp_url = gbp_instances('URL_3D_SECURE_TEST');
+                          $otp_publicKey = $account_settings['test_public_key'];
+                          $otp_gbpReferenceNo = $callback['gbpReferenceNo'];
+
+                          $RedirectURL =  add_query_arg(
+                                          array(
+                                              'page' => rawurlencode($otp_url),
+                                              'publicKey' => rawurlencode($otp_publicKey),
+                                              'gbpReferenceNo' => rawurlencode($otp_gbpReferenceNo)
+                                          ), WP_PLUGIN_URL."/" . plugin_basename( dirname(__FILE__) ) . '/redirect/otp.php');
+
+
+                  }
+                  }
+
+
+        $gbpReferenceNo_action = isset($callback['gbpReferenceNo']) ? $callback['gbpReferenceNo'] : '';
+        if($gbpReferenceNo_action==true){
+          $callbackgbpReferenceNo = $callback['gbpReferenceNo'];
+        }else{
+          $callbackgbpReferenceNo = '';
+        }
+
+
+
+
+                      $chargeResponse = array(
+                          "id" => $callgenerateID,
+                          "tokenreference" => $gbprimepayCardId,
+                          "resultCode" => $callback['resultCode'],
+                          "amount" => $itemamount,
+                          "referenceNo" => $itemReferenceId,
+                          "gbpReferenceNo" => $callbackgbpReferenceNo,
+                          "detail" => $itemdetail,
+                          "customerName" => $customer_full_name,
+                          "customerEmail" => $itemcustomerEmail,
+                          "merchantDefined1" => $callgenerateID,
+                          "merchantDefined2" => null,
+                          "merchantDefined3" => null,
+                          "merchantDefined4" => null,
+                          "merchantDefined5" => null,
+                           "related" => array(
+                                          "self" => "$getgbprimepay_customer_id",
+                                          "buyers" => "$callgetMerchantId",
+                                       ),
+                           "links" => array(
+                                           "self" => "/charges/$callgenerateID",
+                                           "buyers" => "/charges/$callgenerateID/buyers",
+                                           "sellers" => "/charges/$callgenerateID/sellers",
+                                           "status" => "/charges/$callgenerateID/status",
+                                           "fees" => "/charges/$callgenerateID/fees",
+                                           "transactions" => "/charges/$callgenerateID/transactions",
+                                           "batch_transactions" => "/charges/$callgenerateID/batch_transactions",
+                                         ),
+                      );
+
+
+
+
+                      WC()->session->set('gbprimepay_otpcharge', $chargeResponse);
+
+                      $waitResponse = array(
+                            "RedirectURL" => $RedirectURL,
+                      );
+
+
+                    if (!$chargeResponse || !array_key_exists('id', $chargeResponse)) {
+                        throw new Exception(__('Cannot create secure charge.'));
+                    }
+
+                        AS_Gbprimepay::log(  'createOtpCharge Request: ' . print_r( $chargeResponse, true ) );
+
+                    // return $chargeResponse;
+                    return $waitResponse;
+                } catch (Exception $e) {
+                    wc_add_notice($e->getMessage(), 'error');
+                    AS_Gbprimepay::log(  'createOtpCharge error Response: ' . print_r( $e->getMessage(), true ) );
+
+                    return;
+                }
+            }
+
+
+
+
+
     /**
      * ============ END OF CHARGE METHODS =============
      */

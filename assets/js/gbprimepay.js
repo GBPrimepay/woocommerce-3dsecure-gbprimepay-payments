@@ -8,8 +8,13 @@ jQuery(function($) {
             if ($('form.woocommerce-checkout').length) {
                 this.form = $('form.woocommerce-checkout');
             }
-
             $('form.woocommerce-checkout').on('submit', this.onSubmit);
+        },
+
+        isGbprimepayDefault: function() {
+            if ($('#wc-gbprimepay-payment-token-new').length) {
+                $('#wc-gbprimepay-payment-token-new').attr('checked', true).trigger('change');
+            }
         },
 
         block: function() {
@@ -39,10 +44,10 @@ jQuery(function($) {
                 var expires = $('#gbprimepay-card-expiry').val();
                 var cvc =  $('#gbprimepay-card-cvc').val();
                 // window.console.log('gbprimepay-form-submit');
-                
+
             }
         }
     };
 
-    // se_gbprimepay_form.init();
+    se_gbprimepay_form.isGbprimepayDefault();
 });
