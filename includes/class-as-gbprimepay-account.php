@@ -21,6 +21,8 @@ function gbprimepay_settings() {
 			add_action( 'woocommerce_settings_save_' . $this->id, array( $this, 'save' ) );
 			add_action( 'woocommerce_sections_' . $this->id,      array( $this, 'output_sections' ) );
 
+      self::gbprimepay_load_start();
+
 		}
 
 
@@ -126,8 +128,6 @@ function gbprimepay_settings() {
 			global $current_section;
 
 			$settings = $this->get_settings( $current_section );
-
-      self::gbprimepay_load_start();
       self::gbprimepay_top();
 			WC_Admin_Settings::output_fields( $settings );
       self::availablemethods();
@@ -194,7 +194,7 @@ echo $echocode;
         $payment_settings_barcode = get_option('gbprimepay_payment_settings_barcode');
         if(gbp_instances('3D_SECURE_PAYMENT')==TRUE){
             if($account_settings['environment']=='prelive'){
-              $ccintegration = sprintf(__('3-D Secure Credit Card Payment Gateway with GBPrimePay (3-D Secure only available in Production Mode)'));
+              $ccintegration = sprintf(__('3-D Secure Credit Card Payment Gateway with GBPrimePay'));
             }else{
               $ccintegration = sprintf(__('3-D Secure Credit Card Payment Gateway with GBPrimePay'));
             }

@@ -117,8 +117,8 @@ class AS_Gateway_Gbprimepay_Qrcode extends WC_Payment_Gateway_eCheck
       $amount = $order->get_total();
       $itemamount = number_format((($amount * 100)/100), 2, '.', '');
       $itemdetail = 'Charge for order ' . $order->get_order_number();
-      // $itemReferenceId = ''.substr(time(), 4, 5).'00'.$order->get_order_number();
-      $itemReferenceId = '00000'.$order->get_order_number();
+      // $itemReferenceId = '00000'.$order->get_order_number();
+      $itemReferenceId = ''.substr(time(), 4, 5).'00'.$order->get_order_number();
       $itemcustomerEmail = $order->get_billing_email();
       $customer_full_name = $order->get_billing_first_name() . ' ' . $order->get_billing_last_name();
 
@@ -199,20 +199,20 @@ class AS_Gateway_Gbprimepay_Qrcode extends WC_Payment_Gateway_eCheck
     $raw_post = @file_get_contents( 'php://input' );
 		$payload  = json_decode( $raw_post );
     $referenceNo = $payload->{'referenceNo'};
-    $order_id = substr($payload->{'referenceNo'}, 5);
+    $order_id = substr($payload->{'referenceNo'}, 7);
 
               $order = wc_get_order($order_id);
                 if ( isset( $payload->{'resultCode'} ) ) {
                           if ($payload->{'resultCode'} == '00') {
-                                  $order->payment_complete($payload->{'id'});
-                                  update_post_meta($order_id, 'Gbprimepay Charge ID', $payload->{'id'});
+                                  $order->payment_complete($payload->{'merchantDefined1'});
+                                  update_post_meta($order_id, 'Gbprimepay Charge ID', $payload->{'merchantDefined1'});
                                   $order->add_order_note(__( 'GBPrimePay QR Code Payment Authorized.'));
                           }else{
                                   $order->update_status( 'failed', sprintf( __( 'GBPrimePay QR Code Payment failed.', 'gbprimepay-payment-gateways' ) ) );
                           }
                   $account_settings = get_option('gbprimepay_account_settings');
                   if ($account_settings['logging'] === 'yes') {
-                      AS_Gbprimepay::log(  'QR Code Callback Handler: ');
+                      AS_Gbprimepay::log(  'QR Code Callback Handler: ' . print_r( $payload, true ) );
                   }
 
                 }

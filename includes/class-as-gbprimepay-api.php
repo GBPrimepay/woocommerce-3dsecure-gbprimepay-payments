@@ -768,8 +768,8 @@ class AS_Gbprimepay_API {
           $amount = $order->get_total();
           $itemamount = number_format((($amount * 100)/100), 2, '.', '');
           $itemdetail = 'Charge for order ' . $order->get_order_number();
-          // $itemReferenceId = ''.substr(time(), 4, 5).'00'.$order->get_order_number();
-          $itemReferenceId = '00000'.$order->get_order_number();
+          $itemReferenceId = ''.substr(time(), 4, 5).'00'.$order->get_order_number();
+          // $itemReferenceId = '00000'.$order->get_order_number();
           $itemcustomerEmail = $order->get_billing_email();
           $customer_full_name = $order->get_billing_first_name() . ' ' . $order->get_billing_last_name();
           $gbprimepayCardId = $accountId;
@@ -827,9 +827,9 @@ class AS_Gbprimepay_API {
                   "customerEmail" => $itemcustomerEmail,
                   "merchantDefined1" => $callgenerateID,
                   "merchantDefined2" => null,
-                  "merchantDefined3" => null,
+                  "merchantDefined3" => $callback['merchantDefined3'],
                   "merchantDefined4" => null,
-                  "merchantDefined5" => null,
+                  "merchantDefined5" => $gbprimepayCardId,
                    "related" => array(
                                   "self" => "$getgbprimepay_customer_id",
                                   "buyers" => "$callgetMerchantId",
@@ -887,8 +887,8 @@ class AS_Gbprimepay_API {
               $amount = $order->get_total();
               $itemamount = number_format((($amount * 100)/100), 2, '.', '');
               $itemdetail = 'Charge for order ' . $order->get_order_number();
-              // $itemReferenceId = ''.substr(time(), 4, 5).'00'.$order->get_order_number();
-              $itemReferenceId = '00000'.$order->get_order_number();
+              // $itemReferenceId = '00000'.$order->get_order_number();
+              $itemReferenceId = ''.substr(time(), 4, 5).'00'.$order->get_order_number();
               $itemcustomerEmail = $order->get_billing_email();
               $customer_full_name = $order->get_billing_first_name() . ' ' . $order->get_billing_last_name();
               $gbprimepayCardId = $accountId;
@@ -912,8 +912,9 @@ class AS_Gbprimepay_API {
 
                             $otpResponseUrl = $gbprimepay_otpurl['ResponseUrl'];
                             $otpBackgroundUrl = $gbprimepay_otpurl['BackgroundUrl'];
+                            $otpRememberCard = $gbprimepay_otpurl['TokenRememberCard'];
 
-                            $field = "{\r\n\"amount\": $itemamount,\r\n\"referenceNo\": \"$itemReferenceId\",\r\n\"detail\": \"$itemdetail\",\r\n\"customerName\": \"$customer_full_name\",\r\n\"customerEmail\": \"$itemcustomerEmail\",\r\n\"merchantDefined1\": \"$callgenerateID\",\r\n\"merchantDefined2\": null,\r\n\"merchantDefined3\": null,\r\n\"merchantDefined4\": null,\r\n\"merchantDefined5\": null,\r\n\"card\": {\r\n\"token\": \"$gbprimepayCardId\"\r\n},\r\n\"otp\": \"$otpCode\",\r\n\"responseUrl\": \"$otpResponseUrl\",\r\n\"backgroundUrl\": \"$otpBackgroundUrl\"\r\n}\r\n";
+                            $field = "{\r\n\"amount\": $itemamount,\r\n\"referenceNo\": \"$itemReferenceId\",\r\n\"detail\": \"$itemdetail\",\r\n\"customerName\": \"$customer_full_name\",\r\n\"customerEmail\": \"$itemcustomerEmail\",\r\n\"merchantDefined1\": \"$callgenerateID\",\r\n\"merchantDefined2\": null,\r\n\"merchantDefined3\": \"$otpRememberCard\",\r\n\"merchantDefined4\": null,\r\n\"merchantDefined5\": \"$gbprimepayCardId\",\r\n\"card\": {\r\n\"token\": \"$gbprimepayCardId\"\r\n},\r\n\"otp\": \"$otpCode\",\r\n\"responseUrl\": \"$otpResponseUrl\",\r\n\"backgroundUrl\": \"$otpBackgroundUrl\"\r\n}\r\n";
 
 
                       }else{
@@ -974,9 +975,9 @@ class AS_Gbprimepay_API {
                       "customerEmail" => $itemcustomerEmail,
                       "merchantDefined1" => $callgenerateID,
                       "merchantDefined2" => null,
-                      "merchantDefined3" => null,
+                      "merchantDefined3" => $callback['merchantDefined3'],
                       "merchantDefined4" => null,
-                      "merchantDefined5" => null,
+                      "merchantDefined5" => $gbprimepayCardId,
                        "related" => array(
                                       "self" => "$getgbprimepay_customer_id",
                                       "buyers" => "$callgetMerchantId",
@@ -1044,8 +1045,8 @@ class AS_Gbprimepay_API {
                   $amount = $order->get_total();
                   $itemamount = number_format((($amount * 100)/100), 2, '.', '');
                   $itemdetail = 'Charge for order ' . $order->get_order_number();
-                  // $itemReferenceId = ''.substr(time(), 4, 5).'00'.$order->get_order_number();
-                  $itemReferenceId = '00000'.$order->get_order_number();
+                  // $itemReferenceId = '00000'.$order->get_order_number();
+                  $itemReferenceId = ''.substr(time(), 4, 5).'00'.$order->get_order_number();
                   $itemcustomerEmail = $order->get_billing_email();
                   $customer_full_name = $order->get_billing_first_name() . ' ' . $order->get_billing_last_name();
                   $gbprimepayCardId = $accountId;
@@ -1073,8 +1074,11 @@ class AS_Gbprimepay_API {
 
                                 $otpResponseUrl = $gbprimepay_otpurl['ResponseUrl'];
                                 $otpBackgroundUrl = $gbprimepay_otpurl['BackgroundUrl'];
+                                $otpRememberCard = $gbprimepay_otpurl['TokenRememberCard'];
 
-                                $field = "{\r\n\"amount\": $itemamount,\r\n\"referenceNo\": \"$itemReferenceId\",\r\n\"detail\": \"$itemdetail\",\r\n\"customerName\": \"$customer_full_name\",\r\n\"customerEmail\": \"$itemcustomerEmail\",\r\n\"merchantDefined1\": \"$callgenerateID\",\r\n\"merchantDefined2\": null,\r\n\"merchantDefined3\": null,\r\n\"merchantDefined4\": null,\r\n\"merchantDefined5\": null,\r\n\"card\": {\r\n\"token\": \"$gbprimepayCardId\"\r\n},\r\n\"otp\": \"$otpCode\",\r\n\"responseUrl\": \"$otpResponseUrl\",\r\n\"backgroundUrl\": \"$otpBackgroundUrl\"\r\n}\r\n";
+                                AS_Gbprimepay::log(  'gbprimepay_otpurl Request: ' . print_r( $gbprimepay_otpurl, true ) );
+
+                                $field = "{\r\n\"amount\": $itemamount,\r\n\"referenceNo\": \"$itemReferenceId\",\r\n\"detail\": \"$itemdetail\",\r\n\"customerName\": \"$customer_full_name\",\r\n\"customerEmail\": \"$itemcustomerEmail\",\r\n\"merchantDefined1\": \"$callgenerateID\",\r\n\"merchantDefined2\": null,\r\n\"merchantDefined3\": \"$otpRememberCard\",\r\n\"merchantDefined4\": null,\r\n\"merchantDefined5\": \"$gbprimepayCardId\",\r\n\"card\": {\r\n\"token\": \"$gbprimepayCardId\"\r\n},\r\n\"otp\": \"$otpCode\",\r\n\"responseUrl\": \"$otpResponseUrl\",\r\n\"backgroundUrl\": \"$otpBackgroundUrl\"\r\n}\r\n";
 
 
                           }else{
@@ -1085,8 +1089,8 @@ class AS_Gbprimepay_API {
 
                   }
 
-                  $callback = AS_Gbprimepay_API::sendCHARGECurl("$url", $field, 'POST');
 
+                  $callback = AS_Gbprimepay_API::sendCHARGECurl("$url", $field, 'POST');
 
 
                   if ($callback['resultCode']=="00") {
@@ -1132,9 +1136,9 @@ class AS_Gbprimepay_API {
                           "customerEmail" => $itemcustomerEmail,
                           "merchantDefined1" => $callgenerateID,
                           "merchantDefined2" => null,
-                          "merchantDefined3" => null,
+                          "merchantDefined3" => $callback['merchantDefined3'],
                           "merchantDefined4" => null,
-                          "merchantDefined5" => null,
+                          "merchantDefined5" => $gbprimepayCardId,
                            "related" => array(
                                           "self" => "$getgbprimepay_customer_id",
                                           "buyers" => "$callgetMerchantId",

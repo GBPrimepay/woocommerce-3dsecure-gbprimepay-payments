@@ -13,9 +13,9 @@ class AS_Gateway_Gbprimepay extends WC_Payment_Gateway_CC
         $this->account_settings = get_option('gbprimepay_account_settings');
         if(gbp_instances('3D_SECURE_PAYMENT')==TRUE){
           if(($this->account_settings['environment'])=='prelive'){
-            $this->method_description = sprintf(__('3-D Secure Credit Card Payment Gateway with GBPrimePay (3-D Secure only available in Production Mode).'));
+            $this->method_description = sprintf(__('3-D Secure Credit Card Payment Gateway with GBPrimePay'));
           }else{
-            $this->method_description = sprintf(__('3-D Secure Credit Card Payment Gateway with GBPrimePay.'));
+            $this->method_description = sprintf(__('3-D Secure Credit Card Payment Gateway with GBPrimePay'));
           }
         }else{
           $this->method_description = sprintf(__('Credit Card integration with GBPrimePay.'));
@@ -56,8 +56,6 @@ class AS_Gateway_Gbprimepay extends WC_Payment_Gateway_CC
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
         add_action( 'woocommerce_api_'. strtolower( get_class($this) ), array( $this, 'secure_callback_handler' ) );
         add_action( 'init', 'secure_callback_handler' );
-
-
     }
     public function init_form_fields()
     {
@@ -109,7 +107,12 @@ class AS_Gateway_Gbprimepay extends WC_Payment_Gateway_CC
         } else {
             $pay_button_text = '';
         }
-?><div style="padding:1.25em 0 0 0;margin-top:-1.25em;display:inline-block;"><img style="float: left;max-height: 2.8125em;" src="<?php echo plugin_dir_url( __DIR__ ) .'assets/images/creditcard.png'; ?>" alt=""></div><?
+
+$echocode = ''."\r\n";
+$echocode .= '<div style="padding:1.25em 0 0 0;margin-top:-1.25em;display:inline-block;"><img style="float: left;max-height: 2.8125em;" src="'.plugin_dir_url( __DIR__ ).'assets/images/creditcard.png'.'" alt=""></div>'."\r\n";
+$echocode .= ''."\r\n";
+echo $echocode;
+
         echo '<div
 			id="gbprimepay-payment-data"
 			data-panel-label="' . esc_attr($pay_button_text) . '"
@@ -193,9 +196,19 @@ class AS_Gateway_Gbprimepay extends WC_Payment_Gateway_CC
             $otpResponseUrl = $this->get_return_url($order);
             $otpBackgroundUrl = home_url()."/" . 'wc-api/AS_Gateway_Gbprimepay/';
 
+            $otpRememberCard='';
+            $otpTokenNEW = $postData['wc-gbprimepay-payment-token'];
+            $otpis_save_action = isset($postData['wc-gbprimepay-new-payment-method']) ? $postData['wc-gbprimepay-new-payment-method'] : '';
+            if ($otpTokenNEW === 'new') {
+              if($otpis_save_action==true){
+                $otpRememberCard='RememberCard';
+              }
+            }
+
                             WC()->session->set('gbprimepay_otpurl', array(
                                                              'ResponseUrl' => $otpResponseUrl,
                                                              'BackgroundUrl' => $otpBackgroundUrl,
+                                                             'TokenRememberCard' => $otpRememberCard,
                                                               )
                             );
 
@@ -255,6 +268,28 @@ class AS_Gateway_Gbprimepay extends WC_Payment_Gateway_CC
                                   $gbprimepay_otpcharge = WC()->session->get('gbprimepay_otpcharge');
 
                                   if ($gbprimepay_otpcharge['resultCode'] == '00') {
+
+                                  // RememberCard
+                                  $otp_customer_rememberCard = $gbprimepay_otpcharge['merchantDefined3'];
+                                  if ($otp_customer_rememberCard == 'RememberCard') {
+                                      AS_Gbprimepay::log(  'Save RememberCard: ' . print_r( $gbprimepay_otpcharge, true ) );
+                                          $gbprimepayApiObj = new AS_Gbprimepay_API();
+                                          $getCardResponse = $gbprimepayApiObj->getCardAccount($cardAccount['id']);
+
+                                          if (class_exists('WC_Payment_Token_CC') && $this->saved_cards) {
+                                                    if ($otp_customer_rememberCard == 'RememberCard') {
+                                                            $token = new WC_Payment_Token_CC();
+                                                            $token->set_token($cardAccount['id']);
+                                                            $token->set_gateway_id('gbprimepay_wait');
+                                                            $token->set_card_type($getCardResponse['card']['type']);
+                                                            $token->set_last4(substr($getCardResponse['card']['number'], -4));
+                                                            $token->set_expiry_month($getCardResponse['card']['expiry_month']);
+                                                            $token->set_expiry_year('20' . $getCardResponse['card']['expiry_year']);
+                                                            $token->set_user_id(get_current_user_id());
+                                                            $token->save();
+                                                    }
+                                          }
+                                  }
 
                                       $order->update_status('on-hold', __( 'Awaiting 3-D Secure Payment', 'gbprimepay-payment-gateways' ));
 
@@ -422,21 +457,64 @@ class AS_Gateway_Gbprimepay extends WC_Payment_Gateway_CC
             );
         }
     }
+    public function update_token($tokenId) {
+      global $wpdb;
+      $wpdb->update(
+      $wpdb->prefix . 'woocommerce_payment_tokens',
+      array( 'gateway_id' => 'gbprimepay' ),
+      array(
+      'token' => $tokenId,
+      )
+      );
+    }
+
+    public function delete_token($del_tokenId) {
+      global $wpdb;
+      $del_tokenNumber = $wpdb->get_var(
+        $wpdb->prepare(
+          "SELECT token_id FROM {$wpdb->prefix}woocommerce_payment_tokens WHERE token = %d",
+          $del_tokenId
+        )
+      );
+      $wpdb->delete( $wpdb->prefix . 'woocommerce_payment_tokenmeta', array( 'payment_token_id' => $del_tokenNumber ), array( '%d' ) );
+      $wpdb->delete( $wpdb->prefix . 'woocommerce_payment_tokens', array( 'token_id' => $del_tokenNumber ), array( '%d' ) );
+    }
 
     public function secure_callback_handler() {
 
                 $postData = $_POST;
 
                 $referenceNo = $postData['referenceNo'];
-                $order_id = substr($postData['referenceNo'], 5);
+                $order_id = substr($postData['referenceNo'], 7);
 
                 $order = wc_get_order($order_id);
                   if ( isset( $postData['resultCode'] ) ) {
                             if ($postData['resultCode'] == '00') {
-                                    $order->payment_complete($postData['id']);
-                                    update_post_meta($order_id, 'Gbprimepay Charge ID', $postData['id']);
+
+                              // Update RememberCard
+                              $otp_customer_rememberCard = $postData['merchantDefined3'];
+                              if ($otp_customer_rememberCard == 'RememberCard') {
+                                  AS_Gbprimepay::log(  'Update RememberCard: ' . print_r( $postData, true ) );
+
+                                      $tokenId = $postData['merchantDefined5'];
+                                      $this->update_token($tokenId);
+
+                              }
+                                    $order->payment_complete($postData['merchantDefined1']);
+                                    update_post_meta($order_id, 'Gbprimepay Charge ID', $postData['merchantDefined1']);
                                     $order->add_order_note(__( '3-D Secure Payment Authorized.'));
                             }else{
+
+                              // Delete RememberCard
+                              $otp_customer_rememberCard = $postData['merchantDefined3'];
+                              if ($otp_customer_rememberCard == 'RememberCard') {
+
+                                  // Del token
+                                  $del_tokenId = $postData['merchantDefined5'];
+                                  $this->delete_token($del_tokenId);
+                                  AS_Gbprimepay::log(  'Delete RememberCard: ' . print_r( $postData, true ) );
+
+                              }
                                     $order->update_status( 'failed', sprintf( __( '3-D Secure Payment failed.', 'gbprimepay-payment-gateways' ) ) );
                             }
 
