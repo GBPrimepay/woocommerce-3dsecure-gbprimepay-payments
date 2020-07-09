@@ -250,12 +250,15 @@ jQuery(function($) {
         // ToSelect DATA-API
         // =================
 
-        $(window).on('load', function () {
+
+        window.addEventListener('load', function(){
             $('[data-role="toselect"]').each(function () {
                 var $toSelect = $(this)
                 Plugin.call($toSelect, $toSelect.data())
             })
-        })
+        });
+
+
 
 
     function genChecksum(){
@@ -266,14 +269,6 @@ jQuery(function($) {
     function genIssuers(){
       setTimeout(function(){
         $('select[id=gbprimepay_installment-CCInstallmentToSelect]').toSelect();
-      }, 1000);
-
-      setTimeout(function(){
-        $('select[id=gbprimepay_installment-bankcode]').css({display: "block"});
-      }, 1000);
-
-      setTimeout(function(){
-          $('select[id=gbprimepay_installment-term]').css({display: "block"});
       }, 1000);
     }
 
@@ -289,7 +284,11 @@ jQuery(function($) {
         },
 
         isGbprimepayDefault: function() {
-            genIssuers();
+
+setTimeout(function(){
+  genIssuers();
+}, 700);
+
         },
 
         block: function() {
@@ -323,5 +322,12 @@ jQuery(function($) {
         }
     };
 
-    se_gbprimepay_installment_form.isGbprimepayDefault();
+
+
+
+
+    window.addEventListener('load', function(){
+      se_gbprimepay_installment_form.isGbprimepayDefault();
+    });
+
 });
