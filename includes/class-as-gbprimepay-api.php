@@ -39,15 +39,27 @@ class AS_Gbprimepay_API {
         {
 
           $payment_settings = get_option('gbprimepay_payment_settings');
+          $payment_settings_installment = get_option('gbprimepay_payment_settings_installment');
           $payment_settings_qrcode = get_option('gbprimepay_payment_settings_qrcode');
+          $payment_settings_qrcredit = get_option('gbprimepay_payment_settings_qrcredit');
           $payment_settings_barcode = get_option('gbprimepay_payment_settings_barcode');
           if ($paytype === 'direct') {
               if ($payment_settings['enabled'] === 'yes') {
                 $check_credentials = self::check_credentials();
               }
           }
+          if ($paytype === 'installment') {
+              if ($payment_settings_installment['enabled'] === 'yes') {
+                $check_credentials = self::check_credentials();
+              }
+          }
           if ($paytype === 'qrcode') {
               if ($payment_settings_qrcode['enabled'] === 'yes') {
+                $check_credentials = self::check_credentials();
+              }
+          }
+          if ($paytype === 'qrcredit') {
+              if ($payment_settings_qrcredit['enabled'] === 'yes') {
                 $check_credentials = self::check_credentials();
               }
           }
@@ -62,49 +74,85 @@ class AS_Gbprimepay_API {
       }
 
 
-      public static function check_credentials()
-      {
+    public static function check_credentials()
+    {
+    return true;
+    }
+    public static function check_term_regex($string,$issuers)
+    {
+      switch ($issuers) {
+        case 'kasikorn':
+          $pass_array = array(3, 4, 5, 6, 7, 8, 9, 10);
+        break;
+        case 'krungthai':
+          $pass_array = array(3, 4, 5, 6, 7, 8, 9, 10);
+        break;
+        case 'thanachart':
+          $pass_array = array(3, 4, 6, 10);
+        break;
+        case 'ayudhya':
+          $pass_array = array(3, 4, 6, 9, 10);
+        break;
+        case 'firstchoice':
+          $pass_array = array(3, 4, 6, 9, 10, 12, 18, 24);
+        break;
+        case 'scb':
+          $pass_array = array(3, 4, 6, 10);
+        break;
+      }
+      // print_r($pass_array);
+      // exit;
+      $regex = '/^[0-9 ]+(?:,[0-9 ]+)*$/';
+      if (preg_match($regex, $string) === 1) {
+        $arrterm_check = explode(',',preg_replace('/\s+/', '', $string));
+        sort($arrterm_check);
 
-        $account_settings = get_option('gbprimepay_account_settings');
-        $payment_settings = get_option('gbprimepay_payment_settings');
-        $payment_settings_qrcode = get_option('gbprimepay_payment_settings_qrcode');
-        $payment_settings_barcode = get_option('gbprimepay_payment_settings_barcode');
-
-          if ($account_settings['environment'] === 'prelive') {
-              $url = gbp_instances('URL_CHECKPUBLICKEY_TEST');
-          } else {
-              $url = gbp_instances('URL_CHECKPUBLICKEY_LIVE');
+          $arrterm = array();
+          foreach($arrterm_check as $key=>$value){
+            if (in_array($value, $pass_array)) {
+                array_push($arrterm, $value);
+            }
           }
-          $callback = AS_Gbprimepay_API::sendPublicCurl("$url", [], 'GET');
 
-              if (!empty($callback['merchantId']) && !empty($callback['initialShop']) && !empty($callback['merchantName'])) {
-                      if ($account_settings['environment'] === 'prelive') {
-                          $url = gbp_instances('URL_CHECKPRIVATEKEY_TEST');
-                      } else {
-                          $url = gbp_instances('URL_CHECKPRIVATEKEY_LIVE');
-                      }
-                      $callback = AS_Gbprimepay_API::sendPrivateCurl("$url", [], 'GET');
-                          if (!empty($callback['merchantId']) && !empty($callback['initialShop']) && !empty($callback['merchantName'])) {
-                            if ($account_settings['environment'] === 'prelive') {
-                                $url = gbp_instances('URL_CHECKCUSTOMERKEY_TEST');
-                            } else {
-                                $url = gbp_instances('URL_CHECKCUSTOMERKEY_LIVE');
-                            }
-                            $callback = AS_Gbprimepay_API::sendTokenCurl("$url", [], 'POST');
-                                if (!empty($callback['merchantId']) && !empty($callback['initialShop']) && !empty($callback['merchantName'])) {
-                                        return true;
-                                }else{
-                                  return false;
-                                }
-                          }else{
-                            return false;
-                          }
-              }else{
-                return false;
-              }
+      }else{
+        $arrterm = array();
+      }
+      return $arrterm;
+    }
 
-          return false;
+    public static function gen_term_regex($pass_array,$issuers,$total)
+    {
+      $echoterm = '';
+      if(($total >= 3000) && (($total/(min($pass_array))) >= 500)){
+      switch ($issuers) {
+        case 'kasikorn':
+          $echoterm .= '<optgroup label="TextValue[\'Kasikornbank Public Company Limited.\',\'004\']">';
+        break;
+        case 'krungthai':
+          $echoterm .= '<optgroup label="TextValue[\'Krung Thai Bank Public Company Limited.\',\'006\']">';
+        break;
+        case 'thanachart':
+          $echoterm .= '<optgroup label="TextValue[\'Thanachart Bank Public Company Limited.\',\'065\']">';
+        break;
+        case 'ayudhya':
+          $echoterm .= '<optgroup label="TextValue[\'Bank of Ayudhya Public Company Limited.\',\'025\']">';
+        break;
+        case 'firstchoice':
+          $echoterm .= '<optgroup label="TextValue[\'Krungsri First Choice.\',26]">';
+        break;
+        case 'scb':
+          $echoterm .= '<optgroup label="TextValue[\'Siam Commercial Bank Public Company Limited.\',\'014\']">';
+        break;
+      }
 
+      foreach($pass_array as $key=>$value){
+        if(($total >= 3000) && (($total/($value)) >= 500)){
+          $echoterm .= '<option value="' . $value . '">' . $value . ' months</option>';
+        }
+      }
+          $echoterm .= '</optgroup>';
+          }
+      return $echoterm;
     }
 
     public static function check_is_available()
@@ -112,12 +160,44 @@ class AS_Gbprimepay_API {
 
     $account_settings = get_option('gbprimepay_account_settings');
     $payment_settings = get_option('gbprimepay_payment_settings');
+    $payment_settings_installment = get_option('gbprimepay_payment_settings_installment');
     $payment_settings_qrcode = get_option('gbprimepay_payment_settings_qrcode');
+    $payment_settings_qrcredit = get_option('gbprimepay_payment_settings_qrcredit');
     $payment_settings_barcode = get_option('gbprimepay_payment_settings_barcode');
 
+    if (($payment_settings['enabled'] === 'no') && ($payment_settings_installment['enabled'] === 'no') && ($payment_settings_qrcode['enabled'] === 'no') && ($payment_settings_qrcredit['enabled'] === 'no') && ($payment_settings_barcode['enabled'] === 'no')) {
+    return 3;
+    }else{
 
+    if ($account_settings['environment'] === 'prelive') {
+        if (!empty($account_settings['test_public_key']) && !empty($account_settings['test_secret_key']) && !empty($account_settings['test_token_key'])) {
+          return 0;
+        }else{
+          return 3;
+        }
+    } else {
+        if (!empty($account_settings['live_public_key']) && !empty($account_settings['live_secret_key']) && !empty($account_settings['live_token_key'])) {
+          return 0;
+        }else{
+          return 3;
+        }
+    }
+    return 2;
+    }
+    }
 
-    if ($payment_settings['enabled'] === 'yes') {
+    public static function check_save_verified()
+    {
+    $account_settings = get_option('gbprimepay_account_settings');
+    $payment_settings = get_option('gbprimepay_payment_settings');
+    $payment_settings_installment = get_option('gbprimepay_payment_settings_installment');
+    $payment_settings_qrcode = get_option('gbprimepay_payment_settings_qrcode');
+    $payment_settings_qrcredit = get_option('gbprimepay_payment_settings_qrcredit');
+    $payment_settings_barcode = get_option('gbprimepay_payment_settings_barcode');
+
+    if (($payment_settings['enabled'] === 'no') && ($payment_settings_installment['enabled'] === 'no') && ($payment_settings_qrcode['enabled'] === 'no') && ($payment_settings_qrcredit['enabled'] === 'no') && ($payment_settings_barcode['enabled'] === 'no')) {
+    return 3;
+    }else{
 
     if ($account_settings['environment'] === 'prelive') {
         $url = gbp_instances('URL_CHECKPUBLICKEY_TEST');
@@ -153,8 +233,6 @@ class AS_Gbprimepay_API {
         }
 
     return 2;
-    }else{
-    return 3;
     }
     }
 
@@ -674,7 +752,7 @@ class AS_Gbprimepay_API {
 
                 self::$getCardArray = $response;
 
-            AS_Gbprimepay::log(  'createCardAccount Response: ' . print_r( $response, true ) );
+              AS_Gbprimepay::log(  'createCardAccount Response: ' . print_r( $response, true ) );
           }
 
             if ($response) return $response;
@@ -710,9 +788,7 @@ class AS_Gbprimepay_API {
                                 'users' => '/card_accounts/'.$loadCard['id'].'/users'
                             ),
             );
-
             AS_Gbprimepay::log(  'getCardAccount Response: ' . print_r( $response, true ) );
-
             if ($response) return $response;
             else {
                 throw new Exception(__('Something went wrong while get card account.'));
@@ -849,8 +925,7 @@ class AS_Gbprimepay_API {
             if (!$chargeResponse || !array_key_exists('id', $chargeResponse)) {
                 throw new Exception(__('Cannot create charge.'));
             }
-
-                AS_Gbprimepay::log(  'createCharge Request: ' . print_r( $chargeResponse, true ) );
+            AS_Gbprimepay::log(  'createCharge Request: ' . print_r( $chargeResponse, true ) );
 
             return $chargeResponse;
         } catch (Exception $e) {
@@ -1006,8 +1081,7 @@ class AS_Gbprimepay_API {
                 if (!$chargeResponse || !array_key_exists('id', $chargeResponse)) {
                     throw new Exception(__('Cannot create secure charge.'));
                 }
-
-                    AS_Gbprimepay::log(  'createSecureCharge Request: ' . print_r( $chargeResponse, true ) );
+                AS_Gbprimepay::log(  'createSecureCharge Request: ' . print_r( $chargeResponse, true ) );
 
                 // return $chargeResponse;
                 return $waitResponse;
@@ -1075,7 +1149,6 @@ class AS_Gbprimepay_API {
                                 $otpResponseUrl = $gbprimepay_otpurl['ResponseUrl'];
                                 $otpBackgroundUrl = $gbprimepay_otpurl['BackgroundUrl'];
                                 $otpRememberCard = $gbprimepay_otpurl['TokenRememberCard'];
-
                                 AS_Gbprimepay::log(  'gbprimepay_otpurl Request: ' . print_r( $gbprimepay_otpurl, true ) );
 
                                 $field = "{\r\n\"amount\": $itemamount,\r\n\"referenceNo\": \"$itemReferenceId\",\r\n\"detail\": \"$itemdetail\",\r\n\"customerName\": \"$customer_full_name\",\r\n\"customerEmail\": \"$itemcustomerEmail\",\r\n\"merchantDefined1\": \"$callgenerateID\",\r\n\"merchantDefined2\": null,\r\n\"merchantDefined3\": \"$otpRememberCard\",\r\n\"merchantDefined4\": null,\r\n\"merchantDefined5\": \"$gbprimepayCardId\",\r\n\"card\": {\r\n\"token\": \"$gbprimepayCardId\"\r\n},\r\n\"otp\": \"$otpCode\",\r\n\"responseUrl\": \"$otpResponseUrl\",\r\n\"backgroundUrl\": \"$otpBackgroundUrl\"\r\n}\r\n";
@@ -1167,8 +1240,7 @@ class AS_Gbprimepay_API {
                     if (!$chargeResponse || !array_key_exists('id', $chargeResponse)) {
                         throw new Exception(__('Cannot create secure charge.'));
                     }
-
-                        AS_Gbprimepay::log(  'createOtpCharge Request: ' . print_r( $chargeResponse, true ) );
+                    AS_Gbprimepay::log(  'createOtpCharge Request: ' . print_r( $chargeResponse, true ) );
 
                     // return $chargeResponse;
                     return $waitResponse;
@@ -1216,7 +1288,7 @@ class AS_Gbprimepay_API {
                 'zip' => $wpUser->get_billing_postcode()
             );
 
-            AS_Gbprimepay::log(  'createUser Request: ' . print_r( $response, true ) );
+                AS_Gbprimepay::log(  'createUser Request: ' . print_r( $response, true ) );
 
             return $response;
         } catch (Exception $e) {
@@ -1247,7 +1319,7 @@ class AS_Gbprimepay_API {
                 'zip' => $order->get_billing_postcode()
             );
 
-            AS_Gbprimepay::log(  'createUserWithOrder Request: ' . print_r( $response, true ) );
+                AS_Gbprimepay::log(  'createUserWithOrder Request: ' . print_r( $response, true ) );
 
             return $response;
         } catch (Exception $e) {
@@ -1283,8 +1355,7 @@ class AS_Gbprimepay_API {
 
 
 
-
-            AS_Gbprimepay::log(  'gbprimepay_user_id Request: ' . print_r( $gbprimepay_user_id, true ) );
+                AS_Gbprimepay::log(  'gbprimepay_user_id Request: ' . print_r( $gbprimepay_user_id, true ) );
 
             $response = array(
                 'id' => $gbprimepay_user_id,
@@ -1298,7 +1369,7 @@ class AS_Gbprimepay_API {
                 'zip' => $wpUser->get_billing_postcode()
             );
 
-            AS_Gbprimepay::log(  'getUserFromGbprimepay Request: ' . print_r( $response, true ) );
+                AS_Gbprimepay::log(  'getUserFromGbprimepay Request: ' . print_r( $response, true ) );
 
             if (array_key_exists('id', $response)) {
                 return $response;

@@ -38,24 +38,24 @@ class AS_Gateway_Gbprimepay extends WC_Payment_Gateway_CC
         $this->account_settings = get_option('gbprimepay_account_settings');
         $this->payment_settings = get_option('gbprimepay_payment_settings');
         $this->payment_settings_qrcode = get_option('gbprimepay_payment_settings_qrcode');
+        $this->payment_settings_qrcredit = get_option('gbprimepay_payment_settings_qrcredit');
         $this->payment_settings_barcode = get_option('gbprimepay_payment_settings_barcode');
 
         $this->title = $this->get_option('title');
         $this->description1 = $this->get_option('description1');
-//        $this->capture = 'yes' === $this->get_option('capture');
         $this->saved_cards = 'yes';
 
-        // load keys into api
-        // AS_Gbprimepay_API::set_user_credentials($this->username, $this->password, $this->environment);
 
-        // AS_Gbprimepay::log('Direct construct : ');
         update_option('gbprimepay_payment_settings', $this->settings);
 
         // Add hooks
         add_action('wp_enqueue_scripts', array($this, 'payment_scripts')); // not yet use this
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
         add_action( 'woocommerce_api_'. strtolower( get_class($this) ), array( $this, 'secure_callback_handler' ) );
-        add_action( 'init', 'secure_callback_handler' );
+        // add_action( 'init', 'secure_callback_handler' );
+
+
+
     }
     public function init_form_fields()
     {
@@ -112,6 +112,9 @@ $echocode = ''."\r\n";
 $echocode .= '<div style="padding:1.25em 0 0 0;margin-top:-1.25em;display:inline-block;"><img style="float: left;max-height: 2.8125em;" src="'.plugin_dir_url( __DIR__ ).'assets/images/creditcard.png'.'" alt=""></div>'."\r\n";
 $echocode .= ''."\r\n";
 echo $echocode;
+
+
+
 
         echo '<div
 			id="gbprimepay-payment-data"
@@ -178,10 +181,9 @@ echo $echocode;
         $gbprimepayApiObj = new AS_Gbprimepay_API();
         $createCardResponse = $gbprimepayApiObj->createCardAccount($body);
 
-        $account_settings = get_option('gbprimepay_account_settings');
-        if ($account_settings['logging'] === 'yes') {
+
             AS_Gbprimepay::log(  'createUser Request: ' . print_r( $createCardResponse, true ) );
-        }
+
         return $createCardResponse;
     }
 
@@ -272,7 +274,9 @@ echo $echocode;
                                   // RememberCard
                                   $otp_customer_rememberCard = $gbprimepay_otpcharge['merchantDefined3'];
                                   if ($otp_customer_rememberCard == 'RememberCard') {
+
                                       AS_Gbprimepay::log(  'Save RememberCard: ' . print_r( $gbprimepay_otpcharge, true ) );
+
                                           $gbprimepayApiObj = new AS_Gbprimepay_API();
                                           $getCardResponse = $gbprimepayApiObj->getCardAccount($cardAccount['id']);
 
@@ -358,7 +362,7 @@ echo $echocode;
 
                 if (!$token || $token->get_user_id() !== get_current_user_id()) {
                     WC()->session->set('refresh_totals', true);
-                    throw new Exception(__('Invalid payment method. Please input a new card number.', 'woocommerce-gateway-stripe'));
+                    throw new Exception(__('Invalid payment method. Please input a new card number.', 'gbprimepay-payment-gateways'));
                 }
                 $cardAccountId = $token->get_token();
                 $gbprimepayApiObj = new AS_Gbprimepay_API();
@@ -494,7 +498,7 @@ echo $echocode;
                               // Update RememberCard
                               $otp_customer_rememberCard = $postData['merchantDefined3'];
                               if ($otp_customer_rememberCard == 'RememberCard') {
-                                  AS_Gbprimepay::log(  'Update RememberCard: ' . print_r( $postData, true ) );
+                                    AS_Gbprimepay::log(  'Update RememberCard: ' . print_r( $postData, true ) );
 
                                       $tokenId = $postData['merchantDefined5'];
                                       $this->update_token($tokenId);
@@ -512,15 +516,13 @@ echo $echocode;
                                   // Del token
                                   $del_tokenId = $postData['merchantDefined5'];
                                   $this->delete_token($del_tokenId);
-                                  AS_Gbprimepay::log(  'Delete RememberCard: ' . print_r( $postData, true ) );
+                                      AS_Gbprimepay::log(  'Delete RememberCard: ' . print_r( $postData, true ) );
 
                               }
                                     $order->update_status( 'failed', sprintf( __( '3-D Secure Payment failed.', 'gbprimepay-payment-gateways' ) ) );
                             }
 
-                    if ($account_settings['logging'] === 'yes') {
                         AS_Gbprimepay::log(  'Secure Callback Handler: ' . print_r( $postData, true ) );
-                    }
 
                 	}
       }
@@ -636,14 +638,6 @@ echo $echocode;
         $emails = WC()->mailer()->get_emails();
         if (!empty($emails) && !empty($order_id)) {
             $emails['WC_Email_Failed_Order']->trigger($order_id);
-        }
-    }
-
-    public function log( $message ) {
-        $options = get_option('gbprimepay_payment_settings');
-
-        if ( 'yes' === $options['logging'] ) {
-            AS_Gbprimepay::log($message);
         }
     }
 }

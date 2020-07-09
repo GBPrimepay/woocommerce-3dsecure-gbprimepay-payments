@@ -25,11 +25,12 @@ class AS_Gateway_Gbprimepay_Qrcode extends WC_Payment_Gateway_eCheck
         $this->description2 = $this->payment_settings_qrcode['description2'];
 
         $this->environment = $this->account_settings['environment'];
+    		$this->order_button_text = __( 'Continue to payment', 'gbprimepay-payment-gateways-qrcode' );
 
         // AS_Gbprimepay_API::set_user_credentials($this->username, $this->password, $this->environment);
         update_option('gbprimepay_payment_settings_qrcode', $this->settings);
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
-        add_action( 'init', array( $this, 'my_check_order_status' ) );
+        // add_action( 'init', array( $this, 'my_check_order_status' ) );
         add_action( 'init', array( $this, 'qrcode_callback_handler' ) );
         add_action( 'woocommerce_api_'. strtolower( get_class($this) ), array( $this, 'qrcode_callback_handler' ) );
     }
@@ -74,6 +75,10 @@ class AS_Gateway_Gbprimepay_Qrcode extends WC_Payment_Gateway_eCheck
         } else {
             $pay_button_text = '';
         }
+        $echocode = ''."\r\n";
+        $echocode .= '<div style="padding:1.25em 0 0 0;margin-top:-1.25em;display:inline-block;"><img style="float: left;max-height: 2.8125em;" src="'.plugin_dir_url( __DIR__ ).'assets/images/qrcode.png'.'" alt=""></div>'."\r\n";
+        $echocode .= ''."\r\n";
+        echo $echocode;
 
         echo '<div
 			id="gbprimepay-payment-data"
@@ -146,8 +151,7 @@ class AS_Gateway_Gbprimepay_Qrcode extends WC_Payment_Gateway_eCheck
 
       $field = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"token\"\r\n\r\n$itemtoken\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"amount\"\r\n\r\n$itemamount\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"referenceNo\"\r\n\r\n$itemReferenceId\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"payType\"\r\n\r\nF\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"responseUrl\"\r\n\r\n$itemresponseurl\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"backgroundUrl\"\r\n\r\n$itembackgroundurl\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"detail\"\r\n\r\n$itemdetail\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"customerName\"\r\n\r\n$customer_full_name\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"customerEmail\"\r\n\r\n$itemcustomerEmail\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"merchantDefined1\"\r\n\r\n$callgenerateID\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"merchantDefined2\"\r\n\r\n$getgbprimepay_customer_id\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"merchantDefined3\"\r\n\r\n$itemReferenceId\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"merchantDefined4\"\r\n\r\n\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"merchantDefined5\"\r\n\r\n\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--";
 
-
-      AS_Gbprimepay::log(  'generateqrcode Request: ' . print_r( $field, true ) );
+            AS_Gbprimepay::log(  'generateqrcode Request: ' . print_r( $field, true ) );
 
       $qrcodeResponse = AS_Gbprimepay_API::sendQRCurl("$url", $field, 'POST');
 
@@ -175,6 +179,8 @@ class AS_Gateway_Gbprimepay_Qrcode extends WC_Payment_Gateway_eCheck
               echo $this->display_payment_success_message($return_url_qrcode);
               echo '</div>';
               ob_end_flush();
+              ob_flush();
+              flush();
 
         }
     }
@@ -210,10 +216,7 @@ class AS_Gateway_Gbprimepay_Qrcode extends WC_Payment_Gateway_eCheck
                           }else{
                                   $order->update_status( 'failed', sprintf( __( 'GBPrimePay QR Code Payment failed.', 'gbprimepay-payment-gateways' ) ) );
                           }
-                  $account_settings = get_option('gbprimepay_account_settings');
-                  if ($account_settings['logging'] === 'yes') {
                       AS_Gbprimepay::log(  'QR Code Callback Handler: ' . print_r( $payload, true ) );
-                  }
 
                 }
 
@@ -225,14 +228,6 @@ class AS_Gateway_Gbprimepay_Qrcode extends WC_Payment_Gateway_eCheck
         $emails = WC()->mailer()->get_emails();
         if (!empty($emails) && !empty($order_id)) {
             $emails['WC_Email_Failed_Order']->trigger($order_id);
-        }
-    }
-
-    public function log( $message ) {
-        $options = get_option('gbprimepay_payment_settings');
-
-        if ( 'yes' === $options['logging'] ) {
-            AS_Gbprimepay::log($message);
         }
     }
 }
