@@ -13,9 +13,7 @@ class AS_Gateway_Gbprimepay_Installment extends WC_Payment_Gateway_eCheck
         $this->has_fields = true;
         $this->supports = array(
             'products',
-            'tokenization',
-            'refunds',
-            'add_payment_method'
+            'refunds'
         );
 
         $this->init_form_fields();
@@ -65,8 +63,9 @@ class AS_Gateway_Gbprimepay_Installment extends WC_Payment_Gateway_eCheck
           $all_installment_term = $this->payment_settings_installment['kasikorn_installment_term'].', '.$this->payment_settings_installment['krungthai_installment_term'].', '.$this->payment_settings_installment['thanachart_installment_term'].', '.$this->payment_settings_installment['ayudhya_installment_term'].', '.$this->payment_settings_installment['firstchoice_installment_term'].', '.$this->payment_settings_installment['scb_installment_term'];
 
           $all_arrterm_check = explode(',',preg_replace('/\s+/', '', $all_installment_term));
+          $all_arrterm_pass = (array_filter($all_arrterm_check));
 
-          if((WC()->cart->total >= 3000) && ((WC()->cart->total/(min($all_arrterm_check))) >= 500)){
+          if((WC()->cart->total >= 3000) && ((WC()->cart->total/(min($all_arrterm_pass))) >= 500)){
             return true;
           }else{
             return false;
@@ -100,16 +99,13 @@ class AS_Gateway_Gbprimepay_Installment extends WC_Payment_Gateway_eCheck
         } else {
             $pay_button_text = '';
         }
-        $echocode = ''."\r\n";
-        $echocode .= '<div style="padding:1.25em 0 0 0;margin-top:-1.25em;display:inline-block;"><img style="float: left;max-height: 2.8125em;" src="'.plugin_dir_url( __DIR__ ).'assets/images/installment.png'.'" alt=""></div>'."\r\n";
-        $echocode .= ''."\r\n";
-        echo $echocode;
 
         echo '<div
 			id="gbprimepay-payment-installment-data"
 			data-panel-label="' . esc_attr($pay_button_text) . '"
 			data-description="'. esc_attr($this->description2) .'"
 			data-email="' . esc_attr($user_email) . '"
+			data-bankimg="' . plugin_dir_url( __DIR__ ).'assets/images/' . '"
 			data-amount="' . esc_attr($total) . '">';
 
         if ( $this->description2 ) {
@@ -308,7 +304,7 @@ class AS_Gateway_Gbprimepay_Installment extends WC_Payment_Gateway_eCheck
             <option value="" data-keep="true">The number of monthly installments..</option>
         </select>
 
-      <br><br><span id="' . esc_attr($this->id) . '-info" name="' . esc_attr($this->id) . '-info" class="form-control"></span><br><br>';
+      <div id="' . esc_attr($this->id) . '-info" name="' . esc_attr($this->id) . '-info" class="form-control" style="margin:30px 0 40px 0;"></div>';
 
 
       echo '<div class="clear"></div>';

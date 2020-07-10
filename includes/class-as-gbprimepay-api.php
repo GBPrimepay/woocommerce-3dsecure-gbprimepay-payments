@@ -123,6 +123,7 @@ class AS_Gbprimepay_API {
     public static function gen_term_regex($pass_array,$issuers,$total)
     {
       $echoterm = '';
+      if(!empty($pass_array)){
       if(($total >= 3000) && (($total/(min($pass_array))) >= 500)){
       switch ($issuers) {
         case 'kasikorn':
@@ -138,7 +139,7 @@ class AS_Gbprimepay_API {
           $echoterm .= '<optgroup label="TextValue[\'Bank of Ayudhya Public Company Limited.\',\'025\']">';
         break;
         case 'firstchoice':
-          $echoterm .= '<optgroup label="TextValue[\'Krungsri First Choice.\',26]">';
+          $echoterm .= '<optgroup label="TextValue[\'Krungsri First Choice.\',\'026\']">';
         break;
         case 'scb':
           $echoterm .= '<optgroup label="TextValue[\'Siam Commercial Bank Public Company Limited.\',\'014\']">';
@@ -151,6 +152,7 @@ class AS_Gbprimepay_API {
         }
       }
           $echoterm .= '</optgroup>';
+          }
           }
       return $echoterm;
     }

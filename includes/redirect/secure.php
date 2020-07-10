@@ -5,7 +5,7 @@ if(isset($_GET["page"]) && !empty($_GET["page"])){
           '<html><head>' .
           '<script type="text/javascript"> function OnLoadEvent() { document.form.submit(); }</script>' .
           '<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />' .
-          '<title>3-D Secure Credit Card Payment Gateway with GBPrimePay</title></head>' .
+          '<title>GBPrimePay Payments</title></head>' .
           '<body OnLoad="OnLoadEvent();">' .
           'GBPrimePay, Invoking 3-D Secure Payment, Please Wait ..' .
           '<form name="form" action="'. rawurldecode($_GET['page']).'" method="post"  target="_top">' .

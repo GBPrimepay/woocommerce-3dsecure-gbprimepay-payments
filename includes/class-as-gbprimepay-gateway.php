@@ -55,6 +55,7 @@ class AS_Gateway_Gbprimepay extends WC_Payment_Gateway_CC
         // add_action( 'init', 'secure_callback_handler' );
 
 
+add_filter( 'woocommerce_saved_payment_methods_list', 'wc_get_account_saved_payment_methods_list', 10, 2 );
 
     }
     public function init_form_fields()
@@ -79,6 +80,64 @@ class AS_Gateway_Gbprimepay extends WC_Payment_Gateway_CC
             return AS_Gbprimepay_API::get_credentials('direct');
         }
         return false;
+    }
+
+    public function cover_img( $brand_str ) {
+
+      $brand = explode(" ", $brand_str);
+
+      switch ($brand[0]) {
+        case 'Visa':
+          $cover = str_replace('Visa ending in ', '<img src="'.plugin_dir_url( __DIR__ ).'assets/images/credit-cards/visa.svg" class="" style="float: right;border: 0;padding: 4px 4px 2px 0;max-height: 1.618em;">', $brand_str);
+        break;
+        case 'MasterCard':
+          $cover = str_replace('MasterCard ending in ', '<img src="'.plugin_dir_url( __DIR__ ).'assets/images/credit-cards/mastercard.svg" class="" style="float: right;border: 0;padding: 4px 4px 2px 0;max-height: 1.618em;">', $brand_str);
+        break;
+        case 'Amex':
+          $cover = str_replace('Amex ending in ', '<img src="'.plugin_dir_url( __DIR__ ).'assets/images/credit-cards/amex.svg" class="" style="float: right;border: 0;padding: 4px 4px 2px 0;max-height: 1.618em;">', $brand_str);
+        break;
+        case 'JCB':
+          $cover = str_replace('JCB ending in ', '<img src="'.plugin_dir_url( __DIR__ ).'assets/images/credit-cards/jcb.svg" class="" style="float: right;border: 0;padding: 4px 4px 2px 0;max-height: 1.618em;">', $brand_str);
+        break;
+        case 'Unionpay':
+          $cover = str_replace('Unionpay ending in ', '<img src="'.plugin_dir_url( __DIR__ ).'assets/images/credit-cards/visa.svg" class="" style="float: right;border: 0;padding: 4px 4px 2px 0;max-height: 1.618em;">', $brand_str);
+        break;
+        case 'Forbrugsforeningen':
+          $cover = str_replace('Forbrugsforeningen ending in ', '<img src="'.plugin_dir_url( __DIR__ ).'assets/images/credit-cards/visa.svg" class="" style="float: right;border: 0;padding: 4px 4px 2px 0;max-height: 1.618em;">', $brand_str);
+        break;
+        case 'Maestro':
+          $cover = str_replace('Maestro ending in ', '<img src="'.plugin_dir_url( __DIR__ ).'assets/images/credit-cards/visa.svg" class="" style="float: right;border: 0;padding: 4px 4px 2px 0;max-height: 1.618em;">', $brand_str);
+        break;
+        case 'Discover':
+          $cover = str_replace('Discover ending in ', '<img src="'.plugin_dir_url( __DIR__ ).'assets/images/credit-cards/visa.svg" class="" style="float: right;border: 0;padding: 4px 4px 2px 0;max-height: 1.618em;">', $brand_str);
+        break;
+        case 'Dinersclub':
+          $cover = str_replace('Dinersclub ending in ', '<img src="'.plugin_dir_url( __DIR__ ).'assets/images/credit-cards/visa.svg" class="" style="float: right;border: 0;padding: 4px 4px 2px 0;max-height: 1.618em;">', $brand_str);
+        break;
+        case 'Dankort':
+          $cover = str_replace('Dankort ending in ', '<img src="'.plugin_dir_url( __DIR__ ).'assets/images/credit-cards/visa.svg" class="" style="float: right;border: 0;padding: 4px 4px 2px 0;max-height: 1.618em;">', $brand_str);
+        break;
+        default:
+          $cover = str_replace('ending in ', '<img src="'.plugin_dir_url( __DIR__ ).'assets/images/credit-cards/visa.svg" class="" style="float: right;border: 0;padding: 4px 4px 2px 0;max-height: 1.618em;">', $brand_str);
+        break;
+      }
+
+     return $cover;
+   }
+
+    public function get_saved_payment_method_option_html( $token ) {
+     $html = sprintf(
+       '<li class="woocommerce-SavedPaymentMethods-token">
+         <input id="wc-%1$s-payment-token-%2$s" type="radio" name="wc-%1$s-payment-token" value="%2$s" style="width:auto;" class="woocommerce-SavedPaymentMethods-tokenInput" %4$s />
+         <label for="wc-%1$s-payment-token-%2$s">%3$s</label>
+       </li>',
+       esc_attr( $this->id ),
+       esc_attr( $token->get_id() ),
+       $this->cover_img($token->get_display_name()),
+       checked( $token->is_default(), true, false )
+     );
+
+     return apply_filters( 'woocommerce_payment_gateway_get_saved_payment_method_option_html', $html, $token, $this );
     }
 
 
@@ -129,7 +188,7 @@ echo $echocode;
         }
 
         if ($display_token) {
-            $this->saved_payment_methods();
+          $this->saved_payment_methods();
         }
 
         $this->form();

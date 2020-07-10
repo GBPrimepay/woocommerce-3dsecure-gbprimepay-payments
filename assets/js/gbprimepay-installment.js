@@ -183,8 +183,11 @@ jQuery(function($) {
 
 
 
-            var get_amount = $("div#gbprimepay-payment-installment-data").data().amount;;
-            var varSelected = $('select[id=gbprimepay_installment-term] option').filter(':selected').val()
+            var get_amount = $("div#gbprimepay-payment-installment-data").data().amount;
+            var get_bankimg = $("div#gbprimepay-payment-installment-data").data().bankimg;
+
+            var varBank = $('select[id=gbprimepay_installment-bankcode] option').filter(':selected').val();
+            var varSelected = $('select[id=gbprimepay_installment-term] option').filter(':selected').val();
             var varDivision = (parseFloat(get_amount) / varSelected);
             var isDecimal = (varDivision - Math.floor(varDivision)) !== 0;
             var varDivisionFix;
@@ -193,7 +196,55 @@ jQuery(function($) {
             }else{
               varDivisionFix = varDivision;
             };
-            var infotxt = varDivisionFix+' THB/month in '+varSelected+' payments';
+            var varAamount = (parseFloat(get_amount));
+            var isDecimal = (varAamount - Math.floor(varAamount)) !== 0;
+            var varAamountFix;
+            if (isDecimal){
+              varAamountFix = varAamount.toFixed(2);
+            }else{
+              varAamountFix = varAamount;
+            };
+            // var infotxt = varDivisionFix+' THB/month in '+varSelected+' payments';
+var infotxt = '';
+infotxt += '<table border="0" cellpadding="0" cellspacing="0" height="100%" width="100%" style="border: none !important;text-align: center; vertical-align: middle;margin:0;padding: 0;line-height: 1 !important;">';
+infotxt += '<tbody>';
+infotxt += '<tr cellpadding="0" cellspacing="0" height="100%" width="100%" style="border: none !important;padding: 0;">';
+infotxt += '<td colspan="3" cellpadding="0" cellspacing="0" height="100%" width="100%" style="border: none !important;padding: 0 0 0.625em 0;">';
+
+infotxt += '<div style="width:auto; height:5.625emem;display: flex;flex-direction: column;align-items: center;justify-content: center; "><img style="margin: 0px;max-height: 5.000em;" src="';
+infotxt += ''+get_bankimg+'issuerBank'+varBank+'.png';
+infotxt += '" alt=""></div>';
+infotxt += '</td>';
+infotxt += '</tr>';
+infotxt += '<tr cellpadding="0" cellspacing="0" height="100%" width="100%" style="border: none !important;padding: 0;">';
+infotxt += '<td cellpadding="0" cellspacing="0" height="100%" width="2px;" style="border: none !important;padding: 0;"></td>';
+infotxt += '<td cellpadding="0" cellspacing="0" height="100%" width="100%" style="border: none !important;padding: 0;">';
+
+infotxt += '<table border="0" cellpadding="0" cellspacing="0" width="100%" style="border: none !important;text-align: center; vertical-align: middle;margin:0;padding: 0;line-height: 1 !important;">';
+infotxt += '<tbody>';
+infotxt += '<tr cellpadding="0" cellspacing="0" height="100%" width="100%" style="border: none !important;margin:0;padding: 0;">';
+infotxt += '<td colspan="2" rowspan="2" cellpadding="0" cellspacing="0" height="100%" style="border: none !important;width:70%;border: none !important;text-align: right; vertical-align: middle;padding: 0;">';
+infotxt += '<h1 style="border: none !important;width:100%;margin:0;padding: 0 5px 0 0;line-height: 1;"><strong>'+currency_format(varDivisionFix)+'</strong></h1>';
+infotxt += '</td>';
+infotxt += '<td cellpadding="0" cellspacing="0" height="50%" width="100%" style="border: none !important;text-align: left; vertical-align: bottom;padding: 0;"><span style="border: none !important;margin:0;padding:0;line-height: 1 !important;"><strong>x'+varSelected+'</strong></span></td>';
+infotxt += '</tr>';
+infotxt += '<tr cellpadding="0" cellspacing="0" height="100%" width="100%" style="border: none !important;padding: 0;">';
+infotxt += '<td cellpadding="0" cellspacing="0" height="50%" width="100%" style="border: none !important;width:25%;min-width170px;text-align: left; vertical-align: top;padding: 0 0 5px 0;"><span style="border: none !important;margin:0;padding:0;line-height: 1 !important;">payments</span></td>';
+infotxt += '</tr>';
+infotxt += '<tr cellpadding="0" cellspacing="0" height="100%" width="100%" style="border: none !important;padding: 0;">';
+infotxt += '<td colspan="3" cellpadding="0" cellspacing="0" height="100%" width="100%" style="border: none !important;text-align: center; vertical-align: middle;margin:0;padding: 10px 0 0 0;"><span style="border: none !important;margin:0;padding:0 15px 0 0;line-height: 1 !important;">Total Amount </span><span style="border: none !important;margin:0;padding:0;line-height: 1 !important;"><strong>'+currency_format(varAamountFix)+'</strong></span></td>';
+infotxt += '</tr>';
+infotxt += '</tbody>';
+infotxt += '</table>';
+
+infotxt += '</td>';
+infotxt += '<td cellpadding="0" cellspacing="0" height="100%" width="100%" style="border: none !important;padding: 0;"></td>';
+infotxt += '</tr>';
+infotxt += '<tr cellpadding="0" cellspacing="0" height="100%" width="100%" style="border: none !important;padding: 0;">';
+infotxt += '<td colspan="3" cellpadding="0" cellspacing="0" height="100%" width="100%" style="border: none !important;padding: 0;"></td>';
+infotxt += '</tr>';
+infotxt += '</tbody>';
+infotxt += '</table>';
 
 
             if(varSelected){
@@ -259,13 +310,9 @@ jQuery(function($) {
         });
 
 
-
-
-    function genChecksum(){
-    window.console.log('gbprimepay_installment');
-    var hash = 'hashhashhashhashhashhashhashhashhashhashhashhashhashhashhashhashhash';
-    $('#gbprimepay_installment-checksum').val(hash);
-  	}
+        function currency_format(num) {
+          return '' + num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+        }
     function genIssuers(){
       setTimeout(function(){
         $('select[id=gbprimepay_installment-CCInstallmentToSelect]').toSelect();
@@ -316,7 +363,6 @@ setTimeout(function(){
 
                 var bankcode = $('#gbprimepay_installment-publicKey').val().replace(/ /g,'');
                 var term = $('#gbprimepay_installment-term').val();
-                window.console.log('gbprimepay_installment-form-submit'+bankcode);
 
             }
         }

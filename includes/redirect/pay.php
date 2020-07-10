@@ -5,9 +5,9 @@ if(isset($_GET["page"]) && !empty($_GET["page"])){
           '<html><head>' .
           '<script type="text/javascript"> function OnLoadEvent() { setTimeout(function(){genChecksum();}, 1000);setTimeout(function(){document.form.submit();}, 1000); }</script>' .
           '<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />' .
-          '<title>Credit Card Installment integration with GBPrimePay</title></head>' .
+          '<title>GBPrimePay Payments</title></head>' .
           '<body OnLoad="OnLoadEvent();">' .
-          'GBPrimePay, Invoking 3-D Secure Payment, Please Wait ..' .
+          'GBPrimePay, Invoking Secure Payment, Please Wait ..' .
           '<form name="form" action="'. rawurldecode($_GET['page']).'" method="post"  target="_top">' .
           '<input type="hidden" name="publicKey" value="'. rawurldecode($_GET['publicKey']).'">' .
           '<input type="hidden" name="referenceNo" value="'. rawurldecode($_GET['referenceNo']).'">' .
