@@ -212,9 +212,13 @@ class AS_Gateway_Gbprimepay_Qrcredit extends WC_Payment_Gateway_eCheck
               $order = wc_get_order($order_id);
                 if ( isset( $payload->{'resultCode'} ) ) {
                           if ($payload->{'resultCode'} == '00') {
-                                  $order->payment_complete($payload->{'id'});
-                                  update_post_meta($order_id, 'Gbprimepay Charge ID', $payload->{'id'});
-                                  $order->add_order_note(__( 'GBPrimePay QR Visa Payment Authorized.'));
+                                  $order->payment_complete($payload->{'gbpReferenceNo'});
+                                  update_post_meta($order_id, 'Gbprimepay Charge ID', $payload->{'merchantDefined1'});
+                                  $order->add_order_note(
+                                    __( 'GBPrimePay QR Visa Payment Authorized.', 'gbprimepay-payment-gateways' ) . PHP_EOL .
+                                    __( 'Transaction ID: ', 'gbprimepay-payment-gateways' ) . $payload->{'gbpReferenceNo'} . PHP_EOL .
+                                    __( 'Payment Amount: ', 'gbprimepay-payment-gateways' ) . wc_price($payload->{'amount'})
+                                  );
                           }else{
                                   $order->update_status( 'failed', sprintf( __( 'GBPrimePay QR Visa Payment failed.', 'gbprimepay-payment-gateways' ) ) );
                           }

@@ -224,9 +224,14 @@ class AS_Gateway_Gbprimepay_Installment extends WC_Payment_Gateway_eCheck
               $order = wc_get_order($order_id);
                 if ( isset( $postData['resultCode'] ) ) {
                           if ($postData['resultCode'] == '00') {
-                                  $order->payment_complete($postData['merchantDefined1']);
+                                  $order->payment_complete($postData['gbpReferenceNo']);
                                   update_post_meta($order_id, 'Gbprimepay Charge ID', $postData['merchantDefined1']);
-                                  $order->add_order_note(__( 'GBPrimePay Credit Card Installment Payment Authorized.'));
+                                  $order->add_order_note(
+                                    __( 'GBPrimePay Credit Card Installment Payment Authorized.', 'gbprimepay-payment-gateways' ) . PHP_EOL .
+                                    __( 'Transaction ID: ', 'gbprimepay-payment-gateways' ) . $postData['gbpReferenceNo'] . PHP_EOL .
+                                    __( 'Monthly: ', 'gbprimepay-payment-gateways' ) . wc_price($postData['amountPerMonth']) .' x '. $postData['payMonth'] . PHP_EOL .
+                                    __( 'Payment Amount: ', 'gbprimepay-payment-gateways' ) . wc_price($postData['amount'])
+                                  );
                           }else{
                                   $order->update_status( 'failed', sprintf( __( 'GBPrimePay Credit Card Installment Payment failed.', 'gbprimepay-payment-gateways' ) ) );
                           }

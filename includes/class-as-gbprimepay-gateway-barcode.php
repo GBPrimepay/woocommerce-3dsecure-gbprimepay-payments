@@ -224,9 +224,13 @@ echo '</style>';
                 $order = wc_get_order($order_id);
                   if ( isset( $payload->{'resultCode'} ) ) {
                             if ($payload->{'resultCode'} == '00') {
-                                    $order->payment_complete($payload->{'merchantDefined1'});
+                                    $order->payment_complete($payload->{'gbpReferenceNo'});
                                     update_post_meta($order_id, 'Gbprimepay Charge ID', $payload->{'merchantDefined1'});
-                                    $order->add_order_note(__( 'GBPrimePay Bill Payment Authorized.'));
+                                    $order->add_order_note(
+                                      __( 'GBPrimePay Bill Payment Authorized.', 'gbprimepay-payment-gateways' ) . PHP_EOL .
+                                      __( 'Transaction ID: ', 'gbprimepay-payment-gateways' ) . $payload->{'gbpReferenceNo'} . PHP_EOL .
+                                      __( 'Payment Amount: ', 'gbprimepay-payment-gateways' ) . wc_price($payload->{'amount'})
+                                    );
                             }else{
                                     $order->update_status( 'failed', sprintf( __( 'GBPrimePay Bill Payment failed.', 'gbprimepay-payment-gateways' ) ) );
                             }

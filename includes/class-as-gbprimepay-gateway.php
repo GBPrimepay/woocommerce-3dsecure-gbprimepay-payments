@@ -391,8 +391,8 @@ echo $echocode;
                                                 $token->save();
                                         }
                               }
-                              $order->payment_complete($makePaymentResponse['id']);
-                              update_post_meta($order_id, 'Gbprimepay Charge ID', $makePaymentResponse['id']);
+                              $order->payment_complete($makePaymentResponse['gbpReferenceNo']);
+                              update_post_meta($order_id, 'Gbprimepay Charge ID', $makePaymentResponse['merchantDefined1']);
 
                               // Remove cart.
                               WC()->cart->empty_cart();
@@ -488,8 +488,8 @@ echo $echocode;
 
                   if ($makePaymentResponse) {
                       if ($makePaymentResponse['resultCode'] == '00') {
-                          $order->payment_complete($makePaymentResponse['id']);
-                          update_post_meta($order_id, 'Gbprimepay Charge ID', $makePaymentResponse['id']);
+                          $order->payment_complete($makePaymentResponse['gbpReferenceNo']);
+                          update_post_meta($order_id, 'Gbprimepay Charge ID', $makePaymentResponse['merchantDefined1']);
 
                           // Remove cart.
                           WC()->cart->empty_cart();
@@ -563,9 +563,13 @@ echo $echocode;
                                       $this->update_token($tokenId);
 
                               }
-                                    $order->payment_complete($postData['merchantDefined1']);
+                                    $order->payment_complete($postData['gbpReferenceNo']);
                                     update_post_meta($order_id, 'Gbprimepay Charge ID', $postData['merchantDefined1']);
-                                    $order->add_order_note(__( '3-D Secure Payment Authorized.'));
+                            				$order->add_order_note(
+                            					__( '3-D Secure Payment Authorized.', 'gbprimepay-payment-gateways' ) . PHP_EOL .
+                            					__( 'Transaction ID: ', 'gbprimepay-payment-gateways' ) . $postData['gbpReferenceNo'] . PHP_EOL .
+                            					__( 'Payment Amount: ', 'gbprimepay-payment-gateways' ) . wc_price($postData['amount'])
+                            				);
                             }else{
 
                               // Delete RememberCard
