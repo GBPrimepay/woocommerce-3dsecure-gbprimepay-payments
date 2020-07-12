@@ -773,13 +773,26 @@ class AS_Gbprimepay_API {
         try {
 
             $loadCard = self::$getCardArray;
+                    $cardnumber = preg_replace('/[^0-9]/', '', $loadCard['card']['number']);
+                    $digit = (int) mb_substr($cardnumber, 0, 2);
+
+                    if ( in_array( $digit, array(51, 52, 53, 54, 55, 22, 23, 24, 25, 26, 27) ) ) {
+                        $cardtype = 'mastercard';
+                    } else if ( in_array( $digit, array(35) ) ) {
+                        $cardtype = 'jcb';
+                    } else if ( in_array( $digit, array(34, 37) ) ) {
+                        $cardtype = 'amex';
+                    } else {
+                        $cardtype = 'visa';
+                    }
+
             $response = array(
                 'active' => $loadCard['active'],
                 'created_at' => $loadCard['created_at'],
                 'updated_at' => $loadCard['updated_at'],
                 'id' => $loadCard['id'],
                 'card' => array(
-                                'type' => 'Visa',
+                                'type' => $cardtype,
                                 'full_name' => 'full name',
                                 'number' => $loadCard['card']['number'],
                                 'expiry_month' => $loadCard['card']['expirationMonth'],

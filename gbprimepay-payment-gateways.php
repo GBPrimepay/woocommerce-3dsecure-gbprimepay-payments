@@ -112,7 +112,6 @@ add_filter('woocommerce_payment_gateway_get_new_payment_method_option_html_label
       				return;
       			}
       			$this->init_gateways();
-              // AS_Gbprimepay::log( 'Info: AS_Gbprimepay init' . PHP_EOL . ' -- ' . basename(__FILE__) . ' - Line:' . __LINE__ );
 
         }
         public function add_plugin_page(){

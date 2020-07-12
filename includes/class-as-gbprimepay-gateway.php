@@ -334,8 +334,6 @@ echo $echocode;
                                   $otp_customer_rememberCard = $gbprimepay_otpcharge['merchantDefined3'];
                                   if ($otp_customer_rememberCard == 'RememberCard') {
 
-                                      AS_Gbprimepay::log(  'Save RememberCard: ' . print_r( $gbprimepay_otpcharge, true ) );
-
                                           $gbprimepayApiObj = new AS_Gbprimepay_API();
                                           $getCardResponse = $gbprimepayApiObj->getCardAccount($cardAccount['id']);
 
@@ -557,7 +555,6 @@ echo $echocode;
                               // Update RememberCard
                               $otp_customer_rememberCard = $postData['merchantDefined3'];
                               if ($otp_customer_rememberCard == 'RememberCard') {
-                                    AS_Gbprimepay::log(  'Update RememberCard: ' . print_r( $postData, true ) );
 
                                       $tokenId = $postData['merchantDefined5'];
                                       $this->update_token($tokenId);
@@ -579,7 +576,6 @@ echo $echocode;
                                   // Del token
                                   $del_tokenId = $postData['merchantDefined5'];
                                   $this->delete_token($del_tokenId);
-                                      AS_Gbprimepay::log(  'Delete RememberCard: ' . print_r( $postData, true ) );
 
                               }
                                     $order->update_status( 'failed', sprintf( __( '3-D Secure Payment failed.', 'gbprimepay-payment-gateways' ) ) );
@@ -604,22 +600,26 @@ echo $echocode;
           $gbprimepayUser = new AS_Gbprimepay_User_Account(get_current_user_id());
           $getCardResponse = $this->get_card_account($gbprimepayUser, $_POST);
 
-
                                     $cardnumber = preg_replace('/[^0-9]/', '', $getCardResponse['card']['number']);
                                     $digit = (int) mb_substr($cardnumber, 0, 2);
 
 
-                                    if ($digit >= 40 && $digit <= 49) {
-                                        $cardtype = 'visa';
-                                    } else if ($digit >= 51 && $digit <= 55) {
+                                    if ( in_array( $digit, array(51, 52, 53, 54, 55, 22, 23, 24, 25, 26, 27) ) ) {
                                         $cardtype = 'mastercard';
-                                    } else if ($digit >= 60 && $digit <= 65) {
-                                        $cardtype = 'discover';
-                                    } else if ($digit >= 34 && $digit <= 37) {
+                                    } else if ( in_array( $digit, array(35) ) ) {
+                                        $cardtype = 'jcb';
+                                    } else if ( in_array( $digit, array(34, 37) ) ) {
                                         $cardtype = 'amex';
                                     } else {
                                         $cardtype = 'visa';
                                     }
+
+
+                                    // echo '<pre>';
+                                    // print_r($getCardResponse);
+                                    // echo '</pre><br>';
+                                    // echo $cardtype;
+                                    // exit;
 
                     if ($getCardResponse['card']['token']) {
 
