@@ -79,11 +79,12 @@ if (!class_exists('AS_Gbprimepay')) {
             add_action( 'init', array( $this, 'create_gbprimepay_barcode_post_type' ) );
             add_action( 'init', array( $this, 'create_gbprimepay_barcode_payment_page' ) );
             add_filter( 'template_include', array($this, 'gbprimepay_barcode_page_template'));
+      			add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'plugin_action_links' ) );
 
 
           add_action( 'woocommerce_payment_token_deleted', array( $this, 'woocommerce_payment_token_deleted' ), 10, 2 );
 
-          // Make filter
+// Make filter
 function filter_woocommerce_payment_gateway_get_new_payment_method_option_html_label($this_new_method_label, $instance){
   $this_new_method_label = __('Use a new Credit Card', 'woocommerce');
 return $this_new_method_label;
@@ -98,9 +99,6 @@ add_filter('woocommerce_payment_gateway_get_new_payment_method_option_html_label
             return $args;
           }
 
-            // echo '<pre>';
-            // print_r($this);
-            // echo '</pre>';
             remove_action( 'shutdown', 'wp_ob_end_flush_all', 1 );
             add_action( 'shutdown', function() {
                while ( @ob_end_flush() );
@@ -114,6 +112,14 @@ add_filter('woocommerce_payment_gateway_get_new_payment_method_option_html_label
       			$this->init_gateways();
 
         }
+     		public function plugin_action_links( $links ) {
+     			$setting_link = $this->get_setting_link();
+     			$plugin_links = array(
+     				'<a href="' . $setting_link . '">' . __( 'Settings', 'gbprimepay-payment-gateways' ) . '</a>',
+     			);
+
+     			return array_merge( $plugin_links, $links );
+     		}
         public function add_plugin_page(){
           add_menu_page(
               'GBPrimePay Account Settings',
