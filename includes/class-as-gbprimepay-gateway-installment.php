@@ -154,6 +154,8 @@ class AS_Gateway_Gbprimepay_Installment extends WC_Payment_Gateway_eCheck
                     $installment_bankCode = $postData['gbprimepay_installment-bankcode'];
                     $installment_term = $postData['gbprimepay_installment-term'];
                     $installment_detail = 'Charge for order ' . $order->get_order_number();
+                    $installment_customerName = '' . $order->get_billing_first_name(). ' ' .$order->get_billing_last_name();
+                    $installment_customerEmail = '' . $order->get_billing_email();
                     $installment_referenceNo = ''.substr(time(), 4, 5).'00'.$order->get_order_number();
                     $installment_responseUrl = $this->get_return_url($order);
                     $installment_backgroundUrl = home_url()."/" . 'wc-api/AS_Gateway_Gbprimepay_Installment/';
@@ -168,6 +170,8 @@ class AS_Gateway_Gbprimepay_Installment extends WC_Payment_Gateway_eCheck
                                         'responseUrl' => rawurlencode($installment_responseUrl),
                                         'backgroundUrl' => rawurlencode($installment_backgroundUrl),
                                         'detail' => rawurlencode($installment_detail),
+                                        'customerName' => rawurlencode($installment_customerName),
+                                        'customerEmail' => rawurlencode($installment_customerEmail),
                                         'amount' => rawurlencode($installment_amount),
                                         'bankCode' => rawurlencode($installment_bankCode),
                                         'term' => rawurlencode($installment_term),

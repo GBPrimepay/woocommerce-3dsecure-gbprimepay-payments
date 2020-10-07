@@ -4,7 +4,7 @@ if(isset($_GET["page"]) && !empty($_GET["page"])){
   $res =  '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">' .
           '<html><head>' .
           '<script type="text/javascript"> function OnLoadEvent() { document.form.submit(); }</script>' .
-          '<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />' .
+          '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />' .
           '<title>GBPrimePay Payments</title></head>' .
           '<body OnLoad="OnLoadEvent();">' .
           'GBPrimePay, Invoking NON 3-D Secure Payment, Please Wait ..' .

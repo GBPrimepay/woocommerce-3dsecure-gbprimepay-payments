@@ -4,7 +4,7 @@ if(isset($_GET["page"]) && !empty($_GET["page"])){
   $res =  '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">' .
           '<html><head>' .
           '<script type="text/javascript"> function OnLoadEvent() { setTimeout(function(){genChecksum();}, 1000);setTimeout(function(){document.form.submit();}, 1000); }</script>' .
-          '<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />' .
+          '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />' .
           '<title>GBPrimePay Payments</title></head>' .
           '<body OnLoad="OnLoadEvent();">' .
           'GBPrimePay, Invoking Secure Payment, Please Wait ..' .
@@ -14,6 +14,8 @@ if(isset($_GET["page"]) && !empty($_GET["page"])){
           '<input type="hidden" name="responseUrl" value="'. rawurldecode($_GET['responseUrl']).'">' .
           '<input type="hidden" name="backgroundUrl" value="'. rawurldecode($_GET['backgroundUrl']).'">' .
           '<input type="hidden" name="detail" value="'. rawurldecode($_GET['detail']).'">' .
+          '<input type="hidden" name="customerName" value="'. rawurldecode($_GET['customerName']).'">' .
+          '<input type="hidden" name="customerEmail" value="'. rawurldecode($_GET['customerEmail']).'">' .
           '<input type="hidden" name="amount" value="'. rawurldecode($_GET['amount']).'">' .
           '<input type="hidden" name="bankCode" value="'. rawurldecode($_GET['bankCode']).'">' .
           '<input type="hidden" name="term" value="'. rawurldecode($_GET['term']).'">' .
