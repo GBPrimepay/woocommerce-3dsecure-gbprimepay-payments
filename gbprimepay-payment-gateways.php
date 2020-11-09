@@ -8,14 +8,14 @@
  * Description: 3-D Secure Payment Gateway By GBPrimePay
  * Author: GBPrimePay
  * Author URI: https://www.gbprimepay.com
- * Version: 2.0.0
+ * Version: 2.1.0
  * Text Domain: gbprimepay-payments-gateways
 */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
-define( 'AS_GBPRIMEPAY_VERSION', '2.0.0' );
+define( 'AS_GBPRIMEPAY_VERSION', '2.1.0' );
 define( 'AS_GBPRIMEPAY_MIN_PHP_VER', '5.3.0' );
 define( 'AS_GBPRIMEPAY_MIN_WC_VER', '2.5.0' );
 define( 'AS_GBPRIMEPAY_MAIN_FILE', __FILE__ );
@@ -70,7 +70,15 @@ if (!class_exists('AS_Gbprimepay')) {
             add_action( 'wp_ajax_nopriv_check_qrcredit_order_status', array( $this, 'my_check_qrcredit_order_status' ) );
             add_action( 'init', array( $this, 'create_gbprimepay_qrcredit_post_type' ) );
             add_action( 'init', array( $this, 'create_gbprimepay_qrcredit_payment_page' ) );
-            add_filter( 'template_include', array($this, 'gbprimepay_qrcredit_page_template'));
+						add_filter( 'template_include', array($this, 'gbprimepay_qrcredit_page_template'));
+						
+
+						// qrwechat
+            add_action( 'wp_ajax_check_qrwechat_order_status', array( $this, 'my_check_qrwechat_order_status' ) );
+            add_action( 'wp_ajax_nopriv_check_qrwechat_order_status', array( $this, 'my_check_qrwechat_order_status' ) );
+            add_action( 'init', array( $this, 'create_gbprimepay_qrwechat_post_type' ) );
+            add_action( 'init', array( $this, 'create_gbprimepay_qrwechat_payment_page' ) );
+            add_filter( 'template_include', array($this, 'gbprimepay_qrwechat_page_template'));
 
 
             // barcode
@@ -309,6 +317,97 @@ add_filter('woocommerce_payment_gateway_get_new_payment_method_option_html_label
 
 
 
+        // QR Wechat
+        public function my_check_qrwechat_order_status($order_id) {
+
+
+        	// $gateway = new AS_Gateway_Gbprimepay_Qrwechat;
+
+
+        	$order_id = $_POST['order_id'];
+          // $order_id = 685;
+
+
+        	$order = wc_get_order($order_id);
+        	$order_data = $order->get_data();
+
+        	// If order is "completed" or "processing", we can give confirmation that payment has gone through
+        	if($order_data['status'] == 'completed' || $order_data['status'] == 'processing')
+        	{
+        		echo 1; // Payment completed
+        	} elseif ($order_data['status'] == 'pending') {
+        		echo 0; // Payment not completed
+        	}
+
+        	// Always end AJAX-printing scripts with die();
+        	die();
+        }
+        public function create_gbprimepay_qrwechat_post_type() {
+        	register_post_type('gbprimepay_qrwechat',
+        		array(
+        			'labels' => array(
+        				'name' => __('GBPrimePay QR Code'),
+        				'singular_name' => __('GBPrimePay QR Code')
+        			),
+        			'public' => true,
+        			'has_archive' => false,
+        			'publicly_queryable' => true,
+        			'exclude_from_search' => true,
+        			'show_in_menu' => false,
+        			'show_in_nav_menus' => false,
+        			'show_in_admin_bar' => false,
+        			'show_in_rest' => false,
+        			'hierarchical' => false,
+        			'supports' => array('title'),
+        		)
+        	);
+        	flush_rewrite_rules();
+        }
+        public function create_gbprimepay_qrwechat_payment_page() {
+
+        	global $wpdb;
+
+        	// Get the ID of our custom payments page from settings
+        	$qrwechat_post_id = get_option('qrwechat_post_id');
+
+        	// Create a custom GUID (URL) for our custom for our payments page
+        	$guid = home_url('/gbprimepay_qrwechat/pay');
+
+
+        	if ($qrwechat_post_id && get_post_type($qrwechat_post_id) == "gbprimepay_qrwechat" && get_the_guid($qrwechat_post_id) == $guid) {
+        		// Post already created, so return
+        		return;
+        	} else {
+        		// Put together data to create the custom post
+        		$page_data = array(
+        			'post_status' => 'publish',
+        			'post_type' => 'gbprimepay_qrwechat',
+        			'post_title' => 'pay',
+        			'post_content' => 'GBPrimePay QR Code',
+        			'comment_status' => 'closed',
+        			'guid' => $guid,
+        		);
+
+        		// Create the post
+        		$qrwechat_post_id = wp_insert_post($page_data);
+
+        		// Update our settings with the ID of the newly created post
+        		$ppp = update_option('qrwechat_post_id', $qrwechat_post_id);
+        	}
+        }
+        public function gbprimepay_qrwechat_page_template($page_template) {
+
+        	if (get_post_type() && get_post_type() === 'gbprimepay_qrwechat') {
+
+        		return dirname(__FILE__) . '/templates/gbprimepay-gateway-qrwechat.php';
+        	}
+
+        	return $page_template;
+        }
+
+
+
+
         // Bill Payment
         public function my_check_barcode_order_status($order_id) {
 
@@ -522,6 +621,7 @@ add_filter('woocommerce_payment_gateway_get_new_payment_method_option_html_label
             include_once(dirname(__FILE__) . '/includes/class-as-gbprimepay-gateway-installment.php');
             include_once(dirname(__FILE__) . '/includes/class-as-gbprimepay-gateway-qrcode.php');
             include_once(dirname(__FILE__) . '/includes/class-as-gbprimepay-gateway-qrcredit.php');
+            include_once(dirname(__FILE__) . '/includes/class-as-gbprimepay-gateway-qrwechat.php');
             include_once(dirname(__FILE__) . '/includes/class-as-gbprimepay-gateway-barcode.php');
             add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );
         }
@@ -531,6 +631,7 @@ add_filter('woocommerce_payment_gateway_get_new_payment_method_option_html_label
             $methods[] = 'AS_Gateway_Gbprimepay_Installment';
             $methods[] = 'AS_Gateway_Gbprimepay_Qrcode';
             $methods[] = 'AS_Gateway_Gbprimepay_Qrcredit';
+            $methods[] = 'AS_Gateway_Gbprimepay_Qrwechat';
             $methods[] = 'AS_Gateway_Gbprimepay_Barcode';
 
             return $methods;

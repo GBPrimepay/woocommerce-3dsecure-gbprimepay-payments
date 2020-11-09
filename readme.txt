@@ -10,7 +10,7 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 == Description ==
 
-3-D Secure Payment Gateway By GBPrimePay, Accept Credit Card, Credit Card Installment, QR Code, QR Visa and Bill Payment on WooCommerce store with [GBPrimePay Payments](https://www.gbprimepay.com/)
+3-D Secure Payment Gateway By GBPrimePay, Accept Credit Card, Credit Card Installment, QR Code, QR Visa Qr Wechat and Bill Payment on WooCommerce store with [GBPrimePay Payments](https://www.gbprimepay.com/)
 
 
 ## Requirements
@@ -30,6 +30,6 @@ To use the GBPrimePay Payments, you'll first need to [register for an GBPrimePay
 
 
 == Changelog ==
-= 2.0.0 =
+= 2.1.0 =
 
 Public Release

@@ -16,6 +16,8 @@ if(isset($_GET["page"]) && !empty($_GET["page"])){
           '<input type="hidden" name="detail" value="'. rawurldecode($_GET['detail']).'">' .
           '<input type="hidden" name="customerName" value="'. rawurldecode($_GET['customerName']).'">' .
           '<input type="hidden" name="customerEmail" value="'. rawurldecode($_GET['customerEmail']).'">' .
+          '<input type="hidden" name="customerAddress" value="'. rawurldecode($_GET['customerAddress']).'">' .
+          '<input type="hidden" name="customerTelephone" value="'. rawurldecode($_GET['customerTelephone']).'">' .
           '<input type="hidden" name="amount" value="'. rawurldecode($_GET['amount']).'">' .
           '<input type="hidden" name="bankCode" value="'. rawurldecode($_GET['bankCode']).'">' .
           '<input type="hidden" name="term" value="'. rawurldecode($_GET['term']).'">' .

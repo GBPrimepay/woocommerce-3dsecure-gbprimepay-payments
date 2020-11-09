@@ -24,6 +24,9 @@ function gbp_instances( $instances ) {
     'URL_QRCREDIT_TEST' => 'https://api.globalprimepay.com/gbp/gateway/qrcredit',
     'URL_QRCREDIT_LIVE' => 'https://api.gbprimepay.com/gbp/gateway/qrcredit',
 
+    'URL_QRWECHAT_TEST' => 'https://api.globalprimepay.com/gbp/gateway/wechat',
+    'URL_QRWECHAT_LIVE' => 'https://api.gbprimepay.com/gbp/gateway/wechat',
+
     'URL_BARCODE_TEST' => 'https://api.globalprimepay.com/gbp/gateway/barcode',
     'URL_BARCODE_LIVE' => 'https://api.gbprimepay.com/gbp/gateway/barcode',
 

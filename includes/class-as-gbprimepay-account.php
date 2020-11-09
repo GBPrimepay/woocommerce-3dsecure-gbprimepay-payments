@@ -179,6 +179,7 @@ echo $echocode;
         $payment_settings_installment = get_option('gbprimepay_payment_settings_installment');
         $payment_settings_qrcode = get_option('gbprimepay_payment_settings_qrcode');
         $payment_settings_qrcredit = get_option('gbprimepay_payment_settings_qrcredit');
+        $payment_settings_qrwechat = get_option('gbprimepay_payment_settings_qrwechat');
         $payment_settings_barcode = get_option('gbprimepay_payment_settings_barcode');
         if(gbp_instances('3D_SECURE_PAYMENT')==TRUE){
             if($account_settings['environment']=='prelive'){
@@ -219,6 +220,12 @@ echo $echocode;
           $echoenabledpayment_qrcredit = '<span class="woocommerce-input-toggle woocommerce-input-toggle--enabled">Yes</span>';
         }else{
           $echoenabledpayment_qrcredit = '<span class="woocommerce-input-toggle woocommerce-input-toggle--disabled">No</span>';
+
+        }
+        if ($payment_settings_qrwechat['enabled'] === 'yes') {
+          $echoenabledpayment_qrwechat = '<span class="woocommerce-input-toggle woocommerce-input-toggle--enabled">Yes</span>';
+        }else{
+          $echoenabledpayment_qrwechat = '<span class="woocommerce-input-toggle woocommerce-input-toggle--disabled">No</span>';
 
         }
         if ($payment_settings_barcode['enabled'] === 'yes') {
@@ -282,6 +289,18 @@ echo $echocode;
         													$echocode .= '<a href="admin.php?page=wc-settings&amp;tab=checkout&amp;section=gbprimepay_qrcredit">Configuration</a>'."\r\n";
         									$echocode .= '</td>'."\r\n";
                         $echocode .= '</tr>'."\r\n";
+
+                        $echocode .= '<tr>'."\r\n";
+                          $echocode .= '<td class="name" style="padding-left: 30px;">'."\r\n";
+        													$echocode .= '<span id="span-for-active-button">QR Wechat integration with GBPrimePay</span>'."\r\n";
+        												$echocode .= '</td>'."\r\n";
+                          $echocode .= '<td class="status" style="text-align: center;">'."\r\n";
+                            $echocode .= $echoenabledpayment_qrwechat;
+                          $echocode .= '</td><td class="setting" style="text-align: center;">'."\r\n";
+        													$echocode .= '<a href="admin.php?page=wc-settings&amp;tab=checkout&amp;section=gbprimepay_qrwechat">Configuration</a>'."\r\n";
+        									$echocode .= '</td>'."\r\n";
+                        $echocode .= '</tr>'."\r\n";
+
                         $echocode .= '<tr>'."\r\n";
                           $echocode .= '<td class="name" style="padding-left: 30px;">'."\r\n";
         													$echocode .= '<span id="span-for-active-button">Bill Payment integration with GBPrimePay</span>'."\r\n";

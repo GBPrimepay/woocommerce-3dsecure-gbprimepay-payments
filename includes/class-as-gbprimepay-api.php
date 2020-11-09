@@ -42,6 +42,7 @@ class AS_Gbprimepay_API {
           $payment_settings_installment = get_option('gbprimepay_payment_settings_installment');
           $payment_settings_qrcode = get_option('gbprimepay_payment_settings_qrcode');
           $payment_settings_qrcredit = get_option('gbprimepay_payment_settings_qrcredit');
+          $payment_settings_qrwechat = get_option('gbprimepay_payment_settings_qrwechat');
           $payment_settings_barcode = get_option('gbprimepay_payment_settings_barcode');
           if ($paytype === 'direct') {
               if ($payment_settings['enabled'] === 'yes') {
@@ -60,6 +61,11 @@ class AS_Gbprimepay_API {
           }
           if ($paytype === 'qrcredit') {
               if ($payment_settings_qrcredit['enabled'] === 'yes') {
+                $check_credentials = self::check_credentials();
+              }
+          }
+          if ($paytype === 'qrwechat') {
+              if ($payment_settings_qrwechat['enabled'] === 'yes') {
                 $check_credentials = self::check_credentials();
               }
           }
@@ -165,9 +171,10 @@ class AS_Gbprimepay_API {
     $payment_settings_installment = get_option('gbprimepay_payment_settings_installment');
     $payment_settings_qrcode = get_option('gbprimepay_payment_settings_qrcode');
     $payment_settings_qrcredit = get_option('gbprimepay_payment_settings_qrcredit');
+    $payment_settings_qrwechat = get_option('gbprimepay_payment_settings_qrwechat');
     $payment_settings_barcode = get_option('gbprimepay_payment_settings_barcode');
 
-    if (($payment_settings['enabled'] === 'no') && ($payment_settings_installment['enabled'] === 'no') && ($payment_settings_qrcode['enabled'] === 'no') && ($payment_settings_qrcredit['enabled'] === 'no') && ($payment_settings_barcode['enabled'] === 'no')) {
+    if (($payment_settings['enabled'] === 'no') && ($payment_settings_installment['enabled'] === 'no') && ($payment_settings_qrcode['enabled'] === 'no') && ($payment_settings_qrcredit['enabled'] === 'no') && ($payment_settings_qrwechat['enabled'] === 'no') && ($payment_settings_barcode['enabled'] === 'no')) {
     return 3;
     }else{
 
@@ -195,9 +202,10 @@ class AS_Gbprimepay_API {
     $payment_settings_installment = get_option('gbprimepay_payment_settings_installment');
     $payment_settings_qrcode = get_option('gbprimepay_payment_settings_qrcode');
     $payment_settings_qrcredit = get_option('gbprimepay_payment_settings_qrcredit');
+    $payment_settings_qrwechat = get_option('gbprimepay_payment_settings_qrwechat');
     $payment_settings_barcode = get_option('gbprimepay_payment_settings_barcode');
 
-    if (($payment_settings['enabled'] === 'no') && ($payment_settings_installment['enabled'] === 'no') && ($payment_settings_qrcode['enabled'] === 'no') && ($payment_settings_qrcredit['enabled'] === 'no') && ($payment_settings_barcode['enabled'] === 'no')) {
+    if (($payment_settings['enabled'] === 'no') && ($payment_settings_installment['enabled'] === 'no') && ($payment_settings_qrcode['enabled'] === 'no') && ($payment_settings_qrcredit['enabled'] === 'no') && ($payment_settings_qrwechat['enabled'] === 'no') && ($payment_settings_barcode['enabled'] === 'no')) {
     return 3;
     }else{
 
@@ -863,6 +871,8 @@ class AS_Gbprimepay_API {
           // $itemReferenceId = '00000'.$order->get_order_number();
           $itemcustomerEmail = $order->get_billing_email();
           $customer_full_name = $order->get_billing_first_name() . ' ' . $order->get_billing_last_name();
+          $itemcustomerAddress = '' . str_replace("<br/>", " ", $order->get_formatted_billing_address());
+          $itemcustomerTelephone = '' . $order->get_billing_phone();
           $gbprimepayCardId = $accountId;
           $otpCode = 'N';
 
@@ -884,7 +894,7 @@ class AS_Gbprimepay_API {
                         // GBPrimePay Payment
                         $url = gbp_instances('URL_CHARGE_LIVE');
                         $otpCode = 'N';
-                        $field = "{\r\n\"amount\": $itemamount,\r\n\"referenceNo\": \"$itemReferenceId\",\r\n\"detail\": \"$itemdetail\",\r\n\"customerName\": \"$customer_full_name\",\r\n\"customerEmail\": \"$itemcustomerEmail\",\r\n\"merchantDefined1\": \"$callgenerateID\",\r\n\"merchantDefined2\": null,\r\n\"merchantDefined3\": null,\r\n\"merchantDefined4\": null,\r\n\"merchantDefined5\": null,\r\n\"card\": {\r\n\"token\": \"$gbprimepayCardId\"\r\n},\r\n\"otp\": \"$otpCode\"\r\n}\r\n";
+                        $field = "{\r\n\"amount\": $itemamount,\r\n\"referenceNo\": \"$itemReferenceId\",\r\n\"detail\": \"$itemdetail\",\r\n\"customerName\": \"$customer_full_name\",\r\n\"customerEmail\": \"$itemcustomerEmail\",\r\n\"customerAddress\": \"$itemcustomerAddress\",\r\n\"customerTelephone\": \"$itemcustomerTelephone\",\r\n\"merchantDefined1\": \"$callgenerateID\",\r\n\"merchantDefined2\": null,\r\n\"merchantDefined3\": null,\r\n\"merchantDefined4\": null,\r\n\"merchantDefined5\": null,\r\n\"card\": {\r\n\"token\": \"$gbprimepayCardId\"\r\n},\r\n\"otp\": \"$otpCode\"\r\n}\r\n";
 
                   }
           }else{
@@ -892,7 +902,7 @@ class AS_Gbprimepay_API {
                         // GBPrimePay Payment
                         $url = gbp_instances('URL_CHARGE_TEST');
                         $otpCode = 'N';
-                        $field = "{\r\n\"amount\": $itemamount,\r\n\"referenceNo\": \"$itemReferenceId\",\r\n\"detail\": \"$itemdetail\",\r\n\"customerName\": \"$customer_full_name\",\r\n\"customerEmail\": \"$itemcustomerEmail\",\r\n\"merchantDefined1\": \"$callgenerateID\",\r\n\"merchantDefined2\": null,\r\n\"merchantDefined3\": null,\r\n\"merchantDefined4\": null,\r\n\"merchantDefined5\": null,\r\n\"card\": {\r\n\"token\": \"$gbprimepayCardId\"\r\n},\r\n\"otp\": \"$otpCode\"\r\n}\r\n";
+                        $field = "{\r\n\"amount\": $itemamount,\r\n\"referenceNo\": \"$itemReferenceId\",\r\n\"detail\": \"$itemdetail\",\r\n\"customerName\": \"$customer_full_name\",\r\n\"customerEmail\": \"$itemcustomerEmail\",\r\n\"customerAddress\": \"$itemcustomerAddress\",\r\n\"customerTelephone\": \"$itemcustomerTelephone\",\r\n\"merchantDefined1\": \"$callgenerateID\",\r\n\"merchantDefined2\": null,\r\n\"merchantDefined3\": null,\r\n\"merchantDefined4\": null,\r\n\"merchantDefined5\": null,\r\n\"card\": {\r\n\"token\": \"$gbprimepayCardId\"\r\n},\r\n\"otp\": \"$otpCode\"\r\n}\r\n";
 
           }
 
@@ -916,6 +926,8 @@ class AS_Gbprimepay_API {
                   "detail" => $itemdetail,
                   "customerName" => $customer_full_name,
                   "customerEmail" => $itemcustomerEmail,
+                  "customerAddress" => $itemcustomerAddress,
+                  "customerTelephone" => $itemcustomerTelephone,
                   "merchantDefined1" => $callgenerateID,
                   "merchantDefined2" => null,
                   "merchantDefined3" => $callback['merchantDefined3'],
@@ -981,6 +993,8 @@ class AS_Gbprimepay_API {
               $itemReferenceId = ''.substr(time(), 4, 5).'00'.$order->get_order_number();
               $itemcustomerEmail = $order->get_billing_email();
               $customer_full_name = $order->get_billing_first_name() . ' ' . $order->get_billing_last_name();
+              $itemcustomerAddress = '' . str_replace("<br/>", " ", $order->get_formatted_billing_address());
+              $itemcustomerTelephone = '' . $order->get_billing_phone();
               $gbprimepayCardId = $accountId;
               $otpCode = 'N';
 
@@ -1004,7 +1018,7 @@ class AS_Gbprimepay_API {
                             $otpBackgroundUrl = $gbprimepay_otpurl['BackgroundUrl'];
                             $otpRememberCard = $gbprimepay_otpurl['TokenRememberCard'];
 
-                            $field = "{\r\n\"amount\": $itemamount,\r\n\"referenceNo\": \"$itemReferenceId\",\r\n\"detail\": \"$itemdetail\",\r\n\"customerName\": \"$customer_full_name\",\r\n\"customerEmail\": \"$itemcustomerEmail\",\r\n\"merchantDefined1\": \"$callgenerateID\",\r\n\"merchantDefined2\": null,\r\n\"merchantDefined3\": \"$otpRememberCard\",\r\n\"merchantDefined4\": null,\r\n\"merchantDefined5\": \"$gbprimepayCardId\",\r\n\"card\": {\r\n\"token\": \"$gbprimepayCardId\"\r\n},\r\n\"otp\": \"$otpCode\",\r\n\"responseUrl\": \"$otpResponseUrl\",\r\n\"backgroundUrl\": \"$otpBackgroundUrl\"\r\n}\r\n";
+                            $field = "{\r\n\"amount\": $itemamount,\r\n\"referenceNo\": \"$itemReferenceId\",\r\n\"detail\": \"$itemdetail\",\r\n\"customerName\": \"$customer_full_name\",\r\n\"customerEmail\": \"$itemcustomerEmail\",\r\n\"customerAddress\": \"$itemcustomerAddress\",\r\n\"customerTelephone\": \"$itemcustomerTelephone\",\r\n\"merchantDefined1\": \"$callgenerateID\",\r\n\"merchantDefined2\": null,\r\n\"merchantDefined3\": \"$otpRememberCard\",\r\n\"merchantDefined4\": null,\r\n\"merchantDefined5\": \"$gbprimepayCardId\",\r\n\"card\": {\r\n\"token\": \"$gbprimepayCardId\"\r\n},\r\n\"otp\": \"$otpCode\",\r\n\"responseUrl\": \"$otpResponseUrl\",\r\n\"backgroundUrl\": \"$otpBackgroundUrl\"\r\n}\r\n";
 
 
                       }else{
@@ -1063,6 +1077,8 @@ class AS_Gbprimepay_API {
                       "detail" => $itemdetail,
                       "customerName" => $customer_full_name,
                       "customerEmail" => $itemcustomerEmail,
+                      "customerAddress" => $itemcustomerAddress,
+                      "customerTelephone" => $itemcustomerTelephone,
                       "merchantDefined1" => $callgenerateID,
                       "merchantDefined2" => null,
                       "merchantDefined3" => $callback['merchantDefined3'],
@@ -1138,6 +1154,8 @@ class AS_Gbprimepay_API {
                   $itemReferenceId = ''.substr(time(), 4, 5).'00'.$order->get_order_number();
                   $itemcustomerEmail = $order->get_billing_email();
                   $customer_full_name = $order->get_billing_first_name() . ' ' . $order->get_billing_last_name();
+                  $itemcustomerAddress = '' . str_replace("<br/>", " ", $order->get_formatted_billing_address());
+                  $itemcustomerTelephone = '' . $order->get_billing_phone();
                   $gbprimepayCardId = $accountId;
                   $otpCode = 'N';
 
@@ -1166,7 +1184,7 @@ class AS_Gbprimepay_API {
                                 $otpRememberCard = $gbprimepay_otpurl['TokenRememberCard'];
                                 AS_Gbprimepay::log(  'gbprimepay_otpurl Request: ' . print_r( $gbprimepay_otpurl, true ) );
 
-                                $field = "{\r\n\"amount\": $itemamount,\r\n\"referenceNo\": \"$itemReferenceId\",\r\n\"detail\": \"$itemdetail\",\r\n\"customerName\": \"$customer_full_name\",\r\n\"customerEmail\": \"$itemcustomerEmail\",\r\n\"merchantDefined1\": \"$callgenerateID\",\r\n\"merchantDefined2\": null,\r\n\"merchantDefined3\": \"$otpRememberCard\",\r\n\"merchantDefined4\": null,\r\n\"merchantDefined5\": \"$gbprimepayCardId\",\r\n\"card\": {\r\n\"token\": \"$gbprimepayCardId\"\r\n},\r\n\"otp\": \"$otpCode\",\r\n\"responseUrl\": \"$otpResponseUrl\",\r\n\"backgroundUrl\": \"$otpBackgroundUrl\"\r\n}\r\n";
+                                $field = "{\r\n\"amount\": $itemamount,\r\n\"referenceNo\": \"$itemReferenceId\",\r\n\"detail\": \"$itemdetail\",\r\n\"customerName\": \"$customer_full_name\",\r\n\"customerEmail\": \"$itemcustomerEmail\",\r\n\"customerAddress\": \"$itemcustomerAddress\",\r\n\"customerTelephone\": \"$itemcustomerTelephone\",\r\n\"merchantDefined1\": \"$callgenerateID\",\r\n\"merchantDefined2\": null,\r\n\"merchantDefined3\": \"$otpRememberCard\",\r\n\"merchantDefined4\": null,\r\n\"merchantDefined5\": \"$gbprimepayCardId\",\r\n\"card\": {\r\n\"token\": \"$gbprimepayCardId\"\r\n},\r\n\"otp\": \"$otpCode\",\r\n\"responseUrl\": \"$otpResponseUrl\",\r\n\"backgroundUrl\": \"$otpBackgroundUrl\"\r\n}\r\n";
 
 
                           }else{
@@ -1222,6 +1240,8 @@ class AS_Gbprimepay_API {
                           "detail" => $itemdetail,
                           "customerName" => $customer_full_name,
                           "customerEmail" => $itemcustomerEmail,
+                          "customerAddress" => $itemcustomerAddress,
+                          "customerTelephone" => $itemcustomerTelephone,
                           "merchantDefined1" => $callgenerateID,
                           "merchantDefined2" => null,
                           "merchantDefined3" => $callback['merchantDefined3'],
