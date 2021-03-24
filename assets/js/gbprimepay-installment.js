@@ -334,7 +334,7 @@ infotxt += '</table>';
 
 setTimeout(function(){
   genIssuers();
-}, 700);
+}, 900);
 
         },
 
@@ -375,5 +375,42 @@ setTimeout(function(){
     window.addEventListener('load', function(){
       se_gbprimepay_installment_form.isGbprimepayDefault();
     });
+
+
+
+
+
+
+    
+$(document).on('click', '.payment_method_gbprimepay_installment', function(e) {
+    if(
+        $(e.target).is('label[for]')
+        &&
+        $('input#' + $(e.target).attr('for')).length
+    ) {
+        setTimeout(function(){
+            genIssuers();
+        }, 600);
+        return;
+    }
+});
+
+
+
+
+
+
+jQuery('body').on('payment_method_selected', function(){
+    if ($("input[type=radio][name='payment_method'][value='gbprimepay_installment']").prop('checked') == true) {           
+            
+        // genIssuers();   
+        if($('select[name=gbprimepay_installment-bankcode]').find('option').length == 1){
+            setTimeout(function(){
+                $("#payment .payment_methods .payment_method_gbprimepay_installment label").trigger('click');
+                // genIssuers();   
+            }, 400);
+        }
+}
+});
 
 });

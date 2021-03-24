@@ -8,14 +8,14 @@
  * Description: 3-D Secure Payment Gateway By GBPrimePay
  * Author: GBPrimePay
  * Author URI: https://www.gbprimepay.com
- * Version: 2.1.0
+ * Version: 2.2.0
  * Text Domain: gbprimepay-payments-gateways
 */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
-define( 'AS_GBPRIMEPAY_VERSION', '2.1.0' );
+define( 'AS_GBPRIMEPAY_VERSION', '2.2.0' );
 define( 'AS_GBPRIMEPAY_MIN_PHP_VER', '5.3.0' );
 define( 'AS_GBPRIMEPAY_MIN_WC_VER', '2.5.0' );
 define( 'AS_GBPRIMEPAY_MAIN_FILE', __FILE__ );

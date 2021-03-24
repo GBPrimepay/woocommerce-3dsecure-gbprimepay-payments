@@ -30,6 +30,6 @@ To use the GBPrimePay Payments, you'll first need to [register for an GBPrimePay
 
 
 == Changelog ==
-= 2.1.0 =
+= 2.2.0 =
 
 Public Release
