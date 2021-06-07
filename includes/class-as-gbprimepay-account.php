@@ -1,54 +1,33 @@
 <?php
-
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 if ( ! class_exists( 'AS_Gbprimepay_ACCOUNT' ) ) :
-
-
 function gbprimepay_settings() {
-
 	class AS_Gbprimepay_ACCOUNT extends WC_Settings_Page {
-
-
 		public function __construct() {
-
 			$this->id    = 'gbprimepay_settings';
 			$this->label = __( 'GBPrimePay Settings', 'gbprimepay-payment-gateways' );
-
-
       add_action( 'admin_notices', array( $this, 'admin_notices' ), 25 );
-
 			add_filter( 'woocommerce_settings_tabs_array',        array( $this, 'add_settings_page' ), 20 );
 			add_action( 'woocommerce_settings_' . $this->id,      array( $this, 'output' ) );
 			add_action( 'woocommerce_settings_save_' . $this->id, array( $this, 'save' ) );
 			add_action( 'woocommerce_sections_' . $this->id,      array( $this, 'output_sections' ) );
-
 		}
-
-
-
 		public function get_sections() {
-
 			$sections = array(
 				''         => __( 'setting', 'gbprimepay-payment-gateways' )
 			);
-
 			return apply_filters( 'woocommerce_get_sections_' . $this->id, $sections );
 		}
-
-
 		public function get_settings( $current_section = '' ) {
-
 				$settings = apply_filters( 'as_gbprimepay_account_settings', array(
-
           'section_title' => array(
               'name'     => __( '', 'woocommerce-gbprimepay-settings' ),
               'type'     => 'title',
               'desc'     => 'GBPrimePay Account Settings<hr>',
               'id'       => 'gbprimepay_account_settings_section'
           ),
-
           'environment'         => array(
             'title'       => __( 'Environment', 'gbprimepay-payment-gateways' ),
             'type'        => 'select',
@@ -113,36 +92,25 @@ function gbprimepay_settings() {
               'desc_tip'    => __( 'Save debug messages to the WooCommerce System Status log.', 'gbprimepay-payment-gateways' ),
               'id'   => 'gbprimepay_account_settings[logging]'
           ),
-
 					'sectionend'     => array(
 						'type' => 'sectionend',
 						'id'   => 'gbprimepay_account_settings_section'
 					),
-
 				) );
 			return apply_filters( 'woocommerce_get_settings_' . $this->id, $settings, $current_section );
-
 		}
-
 		public function output() {
-
 			global $current_section;
-
 			$settings = $this->get_settings( $current_section );
-
-
       self::gbprimepay_top();
 			WC_Admin_Settings::output_fields( $settings );
       self::availablemethods();
       echo '<p class="description" style="font-size: 12px;">Save changes & Verified, GBPrimePay Payments Settings.</p>';
 		}
     public function notice_message($message) {
-
       // echo $message;
       // exit;
-
     $account_settings = get_option('gbprimepay_account_settings');
-
     if($account_settings['environment']=='prelive'){
       $echopaymode = sprintf(__('Test Mode'));
     }else{
@@ -151,7 +119,6 @@ function gbprimepay_settings() {
         switch ($message) {
           case 0:
 self::add_admin_notice( 'gbprimepay_prompt_connect', 'notice notice-success', 'defective', sprintf( __( 'Verified, GBPrimePay Payments Settings is already set in '.$echopaymode.'.', 'gbprimepay-payment-gateways' ), '' ) );
-
           break;
           case 2:
           break;
@@ -162,18 +129,14 @@ self::add_admin_notice( 'gbprimepay_prompt_connect', 'notice notice-error', 'def
           break;
         }
   }
-
     public function gbprimepay_top() {
 $echocode = ''."\r\n";
 $echocode .= ''."\r\n";
 $echocode .= '<img style="margin:15px 0px 0px -12px !important;" src="'.plugin_dir_url( __DIR__ ).'assets/images/gbprimepay-logo.png'.'" alt="gbprimepay.com">'."\r\n";
 $echocode .= '<h2>GBPrimePay Payments<small class="wc-admin-breadcrumb"><a href="admin.php?page=wc-settings&amp;tab=checkout" aria-label="Return to payments"><img draggable="false" class="emoji" alt="?" src="https://s.w.org/images/core/emoji/11/svg/2934.svg"></a></small></h2>'."\r\n";
 echo $echocode;
-
     }
-
     public function availablemethods() {
-
         $account_settings = get_option('gbprimepay_account_settings');
         $payment_settings = get_option('gbprimepay_payment_settings');
         $payment_settings_installment = get_option('gbprimepay_payment_settings_installment');
@@ -190,49 +153,40 @@ echo $echocode;
         }else{
           $ccintegration = sprintf(__('Credit Card integration with GBPrimePay'));
         }
-
         if($account_settings['environment']=='prelive'){
           $echopaymode = sprintf(__('Test Mode'));
         }else{
           $echopaymode = sprintf(__('Production Mode'));
         }
-
-
         if ($payment_settings['enabled'] === 'yes') {
           $echoenabledpayment = '<span class="woocommerce-input-toggle woocommerce-input-toggle--enabled">Yes</span>';
         }else{
           $echoenabledpayment = '<span class="woocommerce-input-toggle woocommerce-input-toggle--disabled">No</span>';
-
         }
         if ($payment_settings_installment['enabled'] === 'yes') {
           $echoenabledpayment_installment = '<span class="woocommerce-input-toggle woocommerce-input-toggle--enabled">Yes</span>';
         }else{
           $echoenabledpayment_installment = '<span class="woocommerce-input-toggle woocommerce-input-toggle--disabled">No</span>';
-
         }
         if ($payment_settings_qrcode['enabled'] === 'yes') {
           $echoenabledpayment_qrcode = '<span class="woocommerce-input-toggle woocommerce-input-toggle--enabled">Yes</span>';
         }else{
           $echoenabledpayment_qrcode = '<span class="woocommerce-input-toggle woocommerce-input-toggle--disabled">No</span>';
-
         }
         if ($payment_settings_qrcredit['enabled'] === 'yes') {
           $echoenabledpayment_qrcredit = '<span class="woocommerce-input-toggle woocommerce-input-toggle--enabled">Yes</span>';
         }else{
           $echoenabledpayment_qrcredit = '<span class="woocommerce-input-toggle woocommerce-input-toggle--disabled">No</span>';
-
         }
         if ($payment_settings_qrwechat['enabled'] === 'yes') {
           $echoenabledpayment_qrwechat = '<span class="woocommerce-input-toggle woocommerce-input-toggle--enabled">Yes</span>';
         }else{
           $echoenabledpayment_qrwechat = '<span class="woocommerce-input-toggle woocommerce-input-toggle--disabled">No</span>';
-
         }
         if ($payment_settings_barcode['enabled'] === 'yes') {
           $echoenabledpayment_barcode = '<span class="woocommerce-input-toggle woocommerce-input-toggle--enabled">Yes</span>';
         }else{
           $echoenabledpayment_barcode = '<span class="woocommerce-input-toggle woocommerce-input-toggle--disabled">No</span>';
-
         }
         $echocode = ''."\r\n";
         $echocode .= '<div class="wrap">'."\r\n";
@@ -256,7 +210,6 @@ echo $echocode;
         													$echocode .= '<a href="admin.php?page=wc-settings&amp;tab=checkout&amp;section=gbprimepay">Configuration</a>'."\r\n";
         									$echocode .= '</td>'."\r\n";
                         $echocode .= '</tr>'."\r\n";
-
                         $echocode .= '<tr>'."\r\n";
                           $echocode .= '<td class="name" style="padding-left: 30px;">'."\r\n";
         													$echocode .= '<span id="span-for-active-button">Credit Card Installment integration with GBPrimePay</span>'."\r\n";
@@ -267,7 +220,6 @@ echo $echocode;
         													$echocode .= '<a href="admin.php?page=wc-settings&amp;tab=checkout&amp;section=gbprimepay_installment">Configuration</a>'."\r\n";
         									$echocode .= '</td>'."\r\n";
                         $echocode .= '</tr>'."\r\n";
-
                         $echocode .= '<tr>'."\r\n";
                           $echocode .= '<td class="name" style="padding-left: 30px;">'."\r\n";
         													$echocode .= '<span id="span-for-active-button">QR Code integration with GBPrimePay</span>'."\r\n";
@@ -278,7 +230,6 @@ echo $echocode;
         													$echocode .= '<a href="admin.php?page=wc-settings&amp;tab=checkout&amp;section=gbprimepay_qrcode">Configuration</a>'."\r\n";
         									$echocode .= '</td>'."\r\n";
                         $echocode .= '</tr>'."\r\n";
-
                         $echocode .= '<tr>'."\r\n";
                           $echocode .= '<td class="name" style="padding-left: 30px;">'."\r\n";
         													$echocode .= '<span id="span-for-active-button">QR Visa integration with GBPrimePay</span>'."\r\n";
@@ -289,7 +240,6 @@ echo $echocode;
         													$echocode .= '<a href="admin.php?page=wc-settings&amp;tab=checkout&amp;section=gbprimepay_qrcredit">Configuration</a>'."\r\n";
         									$echocode .= '</td>'."\r\n";
                         $echocode .= '</tr>'."\r\n";
-
                         $echocode .= '<tr>'."\r\n";
                           $echocode .= '<td class="name" style="padding-left: 30px;">'."\r\n";
         													$echocode .= '<span id="span-for-active-button">QR Wechat integration with GBPrimePay</span>'."\r\n";
@@ -300,7 +250,6 @@ echo $echocode;
         													$echocode .= '<a href="admin.php?page=wc-settings&amp;tab=checkout&amp;section=gbprimepay_qrwechat">Configuration</a>'."\r\n";
         									$echocode .= '</td>'."\r\n";
                         $echocode .= '</tr>'."\r\n";
-
                         $echocode .= '<tr>'."\r\n";
                           $echocode .= '<td class="name" style="padding-left: 30px;">'."\r\n";
         													$echocode .= '<span id="span-for-active-button">Bill Payment integration with GBPrimePay</span>'."\r\n";
@@ -311,15 +260,12 @@ echo $echocode;
         													$echocode .= '<a href="admin.php?page=wc-settings&amp;tab=checkout&amp;section=gbprimepay_barcode">Configuration</a>'."\r\n";
         									$echocode .= '</td>'."\r\n";
                         $echocode .= '</tr>'."\r\n";
-
                       $echocode .= '</tbody>'."\r\n";
         						$echocode .= '</table>'."\r\n";
             $echocode .= '<br>'."\r\n";
             $echocode .= '<hr>'."\r\n";
            $echocode .= '</div>'."\r\n";
-
         echo $echocode;
-
 }
 public function add_admin_notice( $slug, $class, $style, $message ) {
   $this->notices[ $slug ] = array(
@@ -339,7 +285,6 @@ public function admin_notices() {
     ) );
       echo '</strong></p></div>';
   }else{
-
     echo "<div class='" . esc_attr( $notice['class'] ) . "'><p>";
     echo wp_kses( $notice['message'], array(
       'a' => array(
@@ -350,22 +295,15 @@ public function admin_notices() {
   }
   }
 }
-
 		public function save() {
-
 			global $current_section;
-
 			$settings = $this->get_settings( $current_section );
 			WC_Admin_Settings::save_fields( $settings );
       $checked_check_save_verified = AS_Gbprimepay_API::check_save_verified();
       self::notice_message($checked_check_save_verified);
 		}
-
 	}
-
 	return new AS_Gbprimepay_ACCOUNT();
-
 }
 add_filter( 'woocommerce_get_settings_pages', 'gbprimepay_settings', 15 );
-
 endif;

@@ -1,5 +1,4 @@
 <?php
-
 if(isset($_GET["page"]) && !empty($_GET["page"])){
   $res =  '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">' .
           '<html><head>' .
@@ -46,8 +45,6 @@ if(isset($_GET["page"]) && !empty($_GET["page"])){
           '<center><p>Please click button below to Authenticate your card</p><input type="submit" value="Go"/></p></center>' .
           '</noscript>' .
           '</form></body></html>';
-
   echo $res;
 }
-
 ?>

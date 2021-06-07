@@ -1,9 +1,7 @@
 <?php
-
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
-
 return apply_filters('as_gbprimepay_installment_settings',
     array(
         'enabled' => array(

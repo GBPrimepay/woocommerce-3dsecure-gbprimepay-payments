@@ -1,10 +1,11 @@
 === GBPrimePay Payments ===
 Contributors: gbprimepay.com
 Tags: ecommerce, e-commerce, commerce, woothemes, wordpress ecommerce, store, sales, sell, shop, shopping, cart, checkout, configurable, gbprimepay
-Requires at least: 4.6
-Tested up to: 5.4.2
+Requires at least: 5.3.0
+Tested up to WordPress version:  5.7.2
+Tested up to WooCommerce version:  5.3.0
 Requires PHP: 7.3
-Stable tag: 4.3
+Stable tag: 4.6
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -30,6 +31,6 @@ To use the GBPrimePay Payments, you'll first need to [register for an GBPrimePay
 
 
 == Changelog ==
-= 2.2.0 =
+= 2.3.0 =
 
 Public Release
